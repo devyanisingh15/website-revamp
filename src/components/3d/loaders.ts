@@ -9,3 +9,4 @@ export const loadSwirl = () => import('./scenes/PowderSwirlScene');
 export const loadFigure = () => import('./scenes/FigureScene');
 export const loadTubViewer = () => import('./scenes/TubViewerScene');
 export const loadScoop = () => import('./scenes/ScoopScene');
+export const loadNutritionBox = () => import('./scenes/NutritionBoxScene');

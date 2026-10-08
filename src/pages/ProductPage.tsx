@@ -16,6 +16,7 @@ import { ProductArt } from '@/components/product/ProductArt';
 import { FlavourSelector } from '@/components/product/FlavourSelector';
 import { SizeSelector } from '@/components/product/SizeSelector';
 import { ShakerAnimation } from '@/components/product/ShakerAnimation';
+import { NutritionBox } from '@/components/product/box/NutritionBox';
 import { ReviewsBlock } from '@/components/product/ReviewsBlock';
 import { ProductCard } from '@/components/product/ProductCard';
 import { QuantityStepper } from '@/components/ecommerce/QuantityStepper';
@@ -380,6 +381,7 @@ export default function ProductPage() {
 
       {isBiozyme && <WhyBiozyme powder={flavourColor} />}
       {n.sourced && <NutritionPanel product={product} powder={flavourColor} />}
+      {n.sourced && <NutritionBox product={product} flavourName={flavour?.name ?? ''} flavourColor={flavourColor} sizeLabel={size.label} servings={size.servings} />}
 
       {isBiozyme && (
         <section aria-labelledby="howto-title" className="border-t hairline py-20 md:py-28">
