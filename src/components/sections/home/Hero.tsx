@@ -31,10 +31,9 @@ export function Hero() {
     onUpdate: (p) => stage.current?.style.setProperty('--p', p.toFixed(3)),
   });
 
-  const tub = { body: product.art.body, band: flavour.color, label: product.art.label, sub: product.art.sub, bandText: product.art.bandText, protein: 25 };
 
   return (
-    <section ref={wrap} aria-labelledby="hero-title" className={cx('relative', live ? 'h-[210vh] md:h-[230vh]' : '')}>
+    <section ref={wrap} aria-labelledby="hero-title" className={cx('relative', live ? 'h-[260vh] md:h-[320vh]' : '')}>
       <div ref={stage} className={cx('grain relative overflow-hidden', live ? 'sticky top-0 -mt-[var(--header-h)] h-[100svh]' : 'min-h-[calc(100svh-var(--header-h)-var(--announce-h))]')} style={{ ['--p' as string]: 0 }}>
         {/* Studio backdrop */}
         <div aria-hidden className="absolute inset-0 bg-[radial-gradient(60%_55%_at_62%_48%,#2a1214_0%,#111113_45%,#0a0a0b_100%)]" />
@@ -75,14 +74,15 @@ export function Hero() {
           <div className="relative min-h-0 md:col-span-6 md:col-start-7 md:h-[78vh] lg:col-span-7 lg:col-start-6">
             <Stage3D
               load={loadHeroTub}
-              sceneProps={{ tub, powder: flavour.color, powderAccent: flavour.accent, progress, impulse }}
+              sceneProps={{ productId: product.id, flavourId: flavour.id, sizeLabel: product.sizes[0].label, powder: flavour.color, powderAccent: flavour.accent, progress, impulse }}
               mobileLive
               className="absolute inset-0"
-              label={`3D Biozyme Performance Whey tub in ${flavour.name}. Drag to rotate; scrolling opens the lid and releases a burst of powder. The same information is listed in the proof points beside it.`}
+              canvasClassName="[mask-image:radial-gradient(70%_65%_at_50%_50%,black_40%,transparent_100%)]"
+              label={`3D Biozyme Performance Whey tub in ${flavour.name}. Drag to rotate; scrolling unscrews the cap, looks into the powder and lifts out a scoop. The same information is listed in the proof points beside it.`}
               fallback={
                 <div className="grid size-full place-items-center">
                   <div className="aspect-[200/260] h-[min(56vh,520px)] max-h-full max-w-full animate-[rise_1s_var(--ease-out-expo)_both] drop-shadow-[0_40px_60px_rgba(0,0,0,.6)]">
-                    <ProductArt art={product.art} band={flavour.color} protein={25} title={`${product.shortName} tub, ${flavour.name}`} />
+                    <ProductArt art={product.art} band={flavour.color} protein={25} title={`${product.shortName} tub, ${flavour.name}`} priority />
                   </div>
                 </div>
               }
@@ -90,7 +90,7 @@ export function Hero() {
               {/* Proof callouts fade in as the lid opens */}
               <ul
                 className="pointer-events-none absolute inset-x-0 bottom-16 z-10 hidden flex-col items-end gap-2 md:flex lg:right-4"
-                style={live ? { opacity: 'clamp(0, calc((var(--p) - 0.35) * 4), 1)', transform: 'translateY(calc((1 - clamp(0, calc((var(--p) - 0.35) * 4), 1)) * 16px))' } : undefined}
+                style={live ? { opacity: 'clamp(0, calc((var(--p) - 0.72) * 5), 1)', transform: 'translateY(calc((1 - clamp(0, calc((var(--p) - 0.72) * 5), 1)) * 16px))' } : undefined}
               >
                 {PROOF.map(({ Icon, text, sub }) => (
                   <li key={text} className="flex items-center gap-3 rounded-sm border hairline bg-ink-950/70 px-4 py-2.5 backdrop-blur">

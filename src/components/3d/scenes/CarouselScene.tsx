@@ -1,23 +1,35 @@
-import { useRef } from 'react';
+import { useMemo, useRef } from 'react';
 import { useFrame, useThree } from '@react-three/fiber';
 import * as THREE from 'three';
 import { CanvasShell } from '../CanvasShell';
-import { StudioLights } from '../StudioLights';
-import { Tub } from '../models/Tub';
+import { RealStudio } from '../real/Studio';
+import { PackModel } from '../real/models';
+import { framing, packSpec } from '../real/spec';
+import { getProduct } from '@/data/products';
 import type { SceneProps } from '../Stage3D';
 
 export interface CarouselItem {
   id: string;
-  label: string;
-  sub?: string;
-  body: string;
-  band: string;
+  /** Representative product whose realistic pack stands for the category */
+  productId: string;
 }
 
 export interface CarouselProps {
   items: CarouselItem[];
   index: number;
   onSelect: (i: number) => void;
+}
+
+function CarouselPack({ productId }: { productId: string }) {
+  const p = getProduct(productId)!;
+  const spec = useMemo(() => packSpec(p, p.flavours[0]), [p]);
+  // Normalise every pack type to roughly the same on-screen height
+  const scale = 9.4 / framing(spec).z;
+  return (
+    <group scale={scale}>
+      <PackModel spec={spec} lite />
+    </group>
+  );
 }
 
 /** Ring of floating tubs; the active one rotates to the front and steps forward. */
@@ -66,7 +78,7 @@ function Ring({ items, index: active, onSelect }: CarouselProps) {
               onPointerOver={() => (document.body.style.cursor = 'pointer')}
               onPointerOut={() => (document.body.style.cursor = '')}
             >
-              <Tub lite body={it.body} band={it.band} label={it.label} sub={it.sub} />
+              <CarouselPack productId={it.productId} />
             </group>
           </group>
         );
@@ -78,7 +90,7 @@ function Ring({ items, index: active, onSelect }: CarouselProps) {
 export default function CarouselScene({ active, onReady, ...rest }: CarouselProps & SceneProps) {
   return (
     <CanvasShell active={active} onReady={onReady} camera={{ position: [0, 1.2, 8.4], fov: 30 }}>
-      <StudioLights intensity={0.9} />
+      <RealStudio floor="none" floorY={-1.6} shadow={0.6} />
       <Ring {...rest} />
     </CanvasShell>
   );

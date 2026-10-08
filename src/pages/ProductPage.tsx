@@ -15,7 +15,7 @@ import type { Macro } from '@/components/3d/scenes/ScoopScene';
 import { ProductArt } from '@/components/product/ProductArt';
 import { FlavourSelector } from '@/components/product/FlavourSelector';
 import { SizeSelector } from '@/components/product/SizeSelector';
-import { ShakerAnimation } from '@/components/product/ShakerAnimation';
+import { HowToUse3D } from '@/components/product/HowToUse3D';
 import { NutritionBox } from '@/components/product/box/NutritionBox';
 import { ReviewsBlock } from '@/components/product/ReviewsBlock';
 import { ProductCard } from '@/components/product/ProductCard';
@@ -31,10 +31,12 @@ import { hasWebGL } from '@/lib/webgl';
 import type { Product } from '@/data/types';
 import NotFoundPage from './NotFoundPage';
 
+// Positions are in wrap-label artwork pixels (see components/3d/real/labelArt.ts)
 const VIEWER_HOTSPOTS = [
-  { id: 'protein', label: '25 g protein per scoop', detail: 'Plus 11.75 g EAAs and 5.51 g BCAAs per serving.', angle: 0, y: -0.38 },
-  { id: 'qr', label: 'Batch lab report', detail: 'Enter the batch number to see this batch’s third-party test results.', angle: 2.29, y: 0.37 },
-  { id: 'code', label: 'Authenticity code', detail: 'Scratch the sticker, enter the code, know it’s genuine.', angle: 3.96, y: 0.39 },
+  { id: 'clinical', label: '50% higher protein absorption', detail: 'Clinically tested on Indian bodies; study registered with CTRI.', cx: 2378, cy: 560 },
+  { id: 'nutrition', label: 'Nutrition facts', detail: '25 g protein, 11.75 g EAAs and 5.51 g BCAAs per scoop. Full panel below.', cx: 3368, cy: 400 },
+  { id: 'code', label: 'Authenticity code', detail: 'Scratch the sticker, enter the code, know it’s genuine.', cx: 400, cy: 585 },
+  { id: 'qr', label: 'Batch lab report', detail: 'Enter the batch number to see this batch’s third-party test results.', cx: 805, cy: 565 },
 ];
 
 const WHY = [
@@ -47,15 +49,15 @@ const WHY = [
 
 const BIOZYME_IDS = ['biozyme-performance-whey', 'biozyme-sachets'];
 
-function Viewer({ product, flavourColor, flavourName }: { product: Product; flavourColor: string; flavourName: string }) {
+function Viewer({ product, flavourId, sizeLabel, flavourColor, flavourName }: { product: Product; flavourId: string | null; sizeLabel: string; flavourColor: string; flavourName: string }) {
   const [focus, setFocus] = useState<string | null>(null);
   const [zoomStep, setZoom] = useState<{ n: number; dir: 1 | -1 }>({ n: 0, dir: 1 });
   const [rotateStep, setRotate] = useState<{ n: number; dir: 1 | -1 }>({ n: 0, dir: 1 });
-  const isTub = product.art.shape === 'tub' || product.art.shape === 'tub-wide';
+  // Every pack type now has a realistic 3D model
+  const isTub = true;
   const [webgl, setWebgl] = useState(false);
   useEffect(() => setWebgl(hasWebGL()), []);
   const hotspots = product.id === 'biozyme-performance-whey' ? VIEWER_HOTSPOTS : [];
-  const tub = { body: product.art.body, band: flavourColor, label: product.art.label, sub: product.art.sub, bandText: product.art.bandText, protein: product.nutrition.protein };
   const fallback = (
     <div className="grid size-full place-items-center p-[12%]">
       <div className="aspect-[200/260] h-full max-w-full">
@@ -71,7 +73,7 @@ function Viewer({ product, flavourColor, flavourName }: { product: Product; flav
         {isTub ? (
           <Stage3D
             load={loadTubViewer}
-            sceneProps={{ tub, model3d: product.model3d, hotspots, focus, onFocus: setFocus, zoomStep, rotateStep }}
+            sceneProps={{ productId: product.id, flavourId, sizeLabel, model3d: product.model3d, hotspots, focus, onFocus: setFocus, zoomStep, rotateStep }}
             mobileLive
             allowReducedMotion
             className="absolute inset-0"
@@ -107,7 +109,7 @@ function Viewer({ product, flavourColor, flavourName }: { product: Product; flav
         )}
       </div>
       {hotspots.length > 0 && (
-        <ol className="mt-3 grid grid-cols-3 gap-2" aria-label="Product hotspots">
+        <ol className="mt-3 grid grid-cols-2 gap-2 sm:grid-cols-4" aria-label="Product hotspots">
           {hotspots.map((h, i) => (
             <li key={h.id}>
               <button onClick={() => setFocus(focus === h.id ? null : h.id)} aria-pressed={focus === h.id} className={cx('flex h-full w-full items-start gap-2 rounded-sm border p-3 text-left text-xs transition-colors', focus === h.id ? 'border-proof-400 text-bone-100' : 'hairline text-bone-400 hover:text-bone-100')}>
@@ -306,7 +308,7 @@ export default function ProductPage() {
       {/* Above the fold */}
       <section className="container-x grid gap-10 pb-16 pt-6 lg:grid-cols-12 lg:gap-14 [--ring-bg:#0a0a0b]">
         <div className="lg:sticky lg:top-[calc(var(--header-h)+16px)] lg:col-span-7 lg:self-start">
-          <Viewer product={product} flavourColor={flavourColor} flavourName={flavour?.name ?? ''} />
+          <Viewer product={product} flavourId={flavour?.id ?? null} sizeLabel={size.label} flavourColor={flavourColor} flavourName={flavour?.name ?? ''} />
         </div>
 
         <div className="lg:col-span-5">
@@ -390,7 +392,7 @@ export default function ProductPage() {
               How to Use
             </h2>
             <div className="mt-12">
-              <ShakerAnimation powder={flavourColor} />
+              <HowToUse3D productId={product.id === 'biozyme-sachets' ? 'biozyme-performance-whey' : product.id} flavourId={flavour?.id ?? null} powder={flavourColor} />
             </div>
             <p className="mt-10 max-w-2xl border-l-2 border-amber-signal pl-4 text-sm leading-relaxed text-bone-300">{SITE.usageNote}</p>
           </div>

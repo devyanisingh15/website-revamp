@@ -2,6 +2,7 @@ import { useEffect, useMemo, useRef } from 'react';
 import { useFrame, useThree } from '@react-three/fiber';
 import * as THREE from 'three';
 import { CanvasShell } from '../CanvasShell';
+import { RealStudio } from '../real/Studio';
 import type { SceneProps } from '../Stage3D';
 import { BOX, BOX_FACES, drawBoxFace, rowWorldY, type BoxData, type BoxFace, type LabelRowId } from '@/components/product/box/boxPanels';
 
@@ -68,7 +69,7 @@ function Box({ data, face, onFaceChange, highlight, magnify, reduced }: Nutritio
   const back = useFaceTexture('back', data, highlight);
   const right = useFaceTexture('right', data, highlight);
   const left = useFaceTexture('left', data, highlight);
-  const edges = useMemo(() => new THREE.EdgesGeometry(new THREE.BoxGeometry(BOX.w * 1.002, BOX.h * 1.002, BOX.d * 1.002)), []);
+  const carton = useMemo(() => new THREE.BoxGeometry(BOX.w, BOX.h, BOX.d), []);
   const capColor = useMemo(() => new THREE.Color(data.body).multiplyScalar(0.8), [data.body]);
 
   // External face selection (buttons / keyboard) → shortest rotation to that panel
@@ -163,25 +164,16 @@ function Box({ data, face, onFaceChange, highlight, magnify, reduced }: Nutritio
   return (
     <group>
       <group ref={group}>
-        <mesh>
-          <boxGeometry args={[BOX.w, BOX.h, BOX.d]} />
+        <mesh geometry={carton}>
           {/* +x, -x, +y, -y, +z, -z */}
-          <meshStandardMaterial attach="material-0" map={right} roughness={0.55} emissive="#ffffff" emissiveMap={right} emissiveIntensity={0.22} />
-          <meshStandardMaterial attach="material-1" map={left} roughness={0.55} emissive="#ffffff" emissiveMap={left} emissiveIntensity={0.22} />
+          <meshStandardMaterial attach="material-0" map={right} roughness={0.55} emissive="#ffffff" emissiveMap={right} emissiveIntensity={0.06} />
+          <meshStandardMaterial attach="material-1" map={left} roughness={0.55} emissive="#ffffff" emissiveMap={left} emissiveIntensity={0.06} />
           <meshStandardMaterial attach="material-2" color={capColor} roughness={0.6} />
           <meshStandardMaterial attach="material-3" color={capColor} roughness={0.6} />
-          <meshStandardMaterial attach="material-4" map={front} roughness={0.45} emissive="#ffffff" emissiveMap={front} emissiveIntensity={0.18} />
-          <meshStandardMaterial attach="material-5" map={back} roughness={0.6} emissive="#ffffff" emissiveMap={back} emissiveIntensity={0.5} />
+          <meshStandardMaterial attach="material-4" map={front} roughness={0.45} emissive="#ffffff" emissiveMap={front} emissiveIntensity={0.05} />
+          <meshStandardMaterial attach="material-5" map={back} roughness={0.6} emissive="#ffffff" emissiveMap={back} emissiveIntensity={0.3} />
         </mesh>
-        {/* Thin edge lines read as carton folds */}
-        <lineSegments geometry={edges}>
-          <lineBasicMaterial color="#000" transparent opacity={0.35} />
-        </lineSegments>
       </group>
-      <mesh position={[0, -BOX.h / 2 - 0.25, 0]} rotation-x={-Math.PI / 2}>
-        <circleGeometry args={[1.5, 48]} />
-        <meshBasicMaterial color="#000" transparent opacity={0.35} />
-      </mesh>
     </group>
   );
 }
@@ -189,9 +181,8 @@ function Box({ data, face, onFaceChange, highlight, magnify, reduced }: Nutritio
 export default function NutritionBoxScene({ active, onReady, ...rest }: NutritionBoxProps & SceneProps) {
   return (
     <CanvasShell active={active} onReady={onReady} camera={{ position: [0, 0, 6.6], fov: 32 }}>
-      <ambientLight intensity={0.75} />
-      <directionalLight position={[2.5, 4, 5]} intensity={1.3} />
-      <directionalLight position={[-4, 1, -4]} intensity={0.5} color={rest.data.band} />
+      <ambientLight intensity={0.35} />
+      <RealStudio floor="none" floorY={-BOX.h / 2 - 0.08} shadow={0.6} />
       <Box {...rest} />
     </CanvasShell>
   );

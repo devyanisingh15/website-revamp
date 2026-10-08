@@ -12,6 +12,7 @@ npm install
 npm run dev        # http://localhost:5173
 npm run build      # sitemap + typecheck + production build → dist/
 npm run preview    # serve dist/
+npm run packshots  # with `npm run dev` running: re-render product images from the 3D models
 ```
 
 QA switches:
@@ -58,7 +59,15 @@ src/
 3. A canvas pauses (`frameloop="never"`) when off-screen. On mobile a canvas budget lets only the most visible stage render.
 4. Any scene error falls back to the static render. Every stage has a text alternative, and the same information is always in the DOM.
 
-The scenes are the hero tub (drag, lid opens on scroll, GPU powder burst), absorption (scoop → particles → breakdown → muscle fibre, with a Regular vs Biozyme toggle), the category ring, the flavour swirl, the low-poly goal figure, the PDP tub viewer (drag, pinch/zoom, flavour recolour, hotspots) the nutrition/Why-Biozyme scoop, and the **Read the Label box** on product pages: drag or use the panel buttons/arrow keys to turn the carton. It snaps flat to the nearest panel, and on the Nutrition Facts back the camera levels and eases in so the whole label reads straight-on. *Zoom to read* gives a close-up that pans to whichever table row you hover. Panel artwork is drawn once in `components/product/box/boxPanels.ts` and shared by the 3D textures and the flat no-WebGL fallback. Values the document doesn't supply print as `[x] †`. The tub is **procedural** (primitives plus a canvas-drawn label) until real GLBs exist. `TubViewerScene` already loads `product.model3d` through `useGLTF` with a Draco decoder at `/draco/`.
+**Realistic packaging (`components/3d/real/`).** Every pack is modelled from the reference photos rather than primitives:
+- `models.tsx`: lathe-turned tub/jar with rounded shoulders, threaded neck, knurled screw cap with an embossed MB top, shrink-sleeve wrap label; stand-up pouch (pillowed panels, gusset); sachet; supplement bottle; flow-wrapped bar; matte shaker with flip cap; flat-bottomed scoop with a heaped powder mound; powder surface.
+- `labelArt.ts`: canvas recreations of the pack artwork. The Biozyme wrap follows the 2 kg tub (charcoal panel, MB monogram with yellow B, molecule diagonal, clinically-tested badge, certification column, flavour/net-weight strip) with directions, authenticity sticker and a nutrition facts panel on the back. The pouch follows the MB FiT High Protein Oats pack. Only claims from the content document are printed; unknown values print as `[x]`.
+- `Studio.tsx`: photographic lighting modelled on the reference reel (warm window softbox, cool rim, bounce), a polished marble counter (dark or light) that fades into the page, and contact shadows. No HDRI download.
+- `spec.ts`: maps each catalogue product (+ flavour + size) to a pack type, proportions and artwork.
+
+**Scenes.** Hero (scroll-scrubbed like the reel's opening: 3/4 shot → top-down → cap unscrews → into the powder → heaped scoop rises), PDP viewer (any pack; drag/pinch/zoom; hotspots placed in label-art pixels on the clinical badge, nutrition panel, authenticity code and batch QR), **How to Use ritual** on product pages (the reel's second half: scoop tips powder into the shaker and it swirls in → cap on and shake → tub + shaker hero shot on marble; auto-plays, step list controls it), category ring (realistic packs), absorption story, flavour swirl, goal figure, nutrition scoop, and the **Read the Label box** (drag or panel buttons to turn; snaps to panels; levels and eases in on the Nutrition Facts back; *Zoom to read* pans to the hovered row).
+
+**Packshots.** `npm run packshots` renders every product (and each Biozyme flavour) from these models through the dev-only `packshot.html` page into `public/packshots/*.webp` (~35 KB each) and `src/data/packshots.json`. `ProductArt` uses them everywhere (cards, menus, cart, compare, fallbacks), with vector art only as a last resort. Re-run after changing artwork or models. `TubViewerScene` will load `product.model3d` (Draco GLB at `/draco/`) instead when the 3D team supplies one.
 
 ## Mock data and placeholders (all must be replaced)
 
@@ -76,7 +85,7 @@ The scenes are the hero tub (drag, lid opens on scroll, GPU powder burst), absor
 - **Goal routines:** a draft slot mapping, labelled "pending nutritionist review".
 
 ## Assets still required
-Official logo SVG (the wordmark is a typographic placeholder), product photography, Draco GLB tub models under 2 MB (plus decoder files in `public/draco/`), label images per flavour, consented testimonial photos, Fit Hub imagery and an OG share image.
+Print-ready dielines to replace the recreated pack artwork (the 3D labels are close recreations from photos, not the official files). Official logo SVG (the wordmark is a typographic placeholder), product photography, Draco GLB tub models under 2 MB (plus decoder files in `public/draco/`), label images per flavour, consented testimonial photos, Fit Hub imagery and an OG share image.
 
 ## Backend integrations still required
 Product information and pricing, inventory, reviews, search, authenticity and lab reports, pincode/serviceability, cart/checkout plus payment gateway (UPI, cards, net banking, wallets, COD), orders/logistics tracking, identity/OTP, loyalty, newsletter ESP, support ticketing and CMS (Fit Hub, policies).

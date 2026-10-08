@@ -1,0 +1,61 @@
+{
+  "biozyme-performance-whey": {
+    "rich-milk-chocolate": "/packshots/biozyme-performance-whey--rich-milk-chocolate.webp",
+    "french-vanilla-creme": "/packshots/biozyme-performance-whey--french-vanilla-creme.webp",
+    "chocolate-hazelnut": "/packshots/biozyme-performance-whey--chocolate-hazelnut.webp",
+    "mango": "/packshots/biozyme-performance-whey--mango.webp",
+    "kesar-pista-badam": "/packshots/biozyme-performance-whey--kesar-pista-badam.webp"
+  },
+  "biozyme-gold-whey": {
+    "default": "/packshots/biozyme-gold-whey.webp"
+  },
+  "biozyme-iso-zero": {
+    "default": "/packshots/biozyme-iso-zero.webp"
+  },
+  "raw-whey": {
+    "default": "/packshots/raw-whey.webp"
+  },
+  "mass-gainer-xxl": {
+    "default": "/packshots/mass-gainer-xxl.webp"
+  },
+  "plant-protein": {
+    "default": "/packshots/plant-protein.webp"
+  },
+  "pre-workout": {
+    "default": "/packshots/pre-workout.webp"
+  },
+  "creatine-monohydrate": {
+    "default": "/packshots/creatine-monohydrate.webp"
+  },
+  "bcaa": {
+    "default": "/packshots/bcaa.webp"
+  },
+  "protein-bar": {
+    "default": "/packshots/protein-bar.webp"
+  },
+  "peanut-butter": {
+    "default": "/packshots/peanut-butter.webp"
+  },
+  "biozyme-sachets": {
+    "rich-milk-chocolate": "/packshots/biozyme-sachets--rich-milk-chocolate.webp",
+    "chocolate-hazelnut": "/packshots/biozyme-sachets--chocolate-hazelnut.webp",
+    "french-vanilla-creme": "/packshots/biozyme-sachets--french-vanilla-creme.webp",
+    "mango": "/packshots/biozyme-sachets--mango.webp",
+    "kesar-pista-badam": "/packshots/biozyme-sachets--kesar-pista-badam.webp"
+  },
+  "high-protein-oats": {
+    "default": "/packshots/high-protein-oats.webp"
+  },
+  "l-carnitine": {
+    "default": "/packshots/l-carnitine.webp"
+  },
+  "multivitamin": {
+    "default": "/packshots/multivitamin.webp"
+  },
+  "fish-oil": {
+    "default": "/packshots/fish-oil.webp"
+  },
+  "shaker-bottle": {
+    "default": "/packshots/shaker-bottle.webp"
+  }
+}

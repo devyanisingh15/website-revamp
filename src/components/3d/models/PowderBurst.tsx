@@ -51,12 +51,14 @@ export function PowderBurst({
   accent,
   origin = [0, 0, 0],
   count = 2600,
+  size = 110,
 }: {
   progress: React.RefObject<number>;
   color: string;
   accent?: string;
   origin?: [number, number, number];
   count?: number;
+  size?: number;
 }) {
   const mat = useRef<THREE.ShaderMaterial>(null);
   const geom = useMemo(() => {
@@ -99,7 +101,7 @@ export function PowderBurst({
     if (!u) return;
     u.uP.value = progress.current ?? 0;
     u.uTime.value = s.clock.elapsedTime;
-    u.uSize.value = 110 * s.viewport.dpr;
+    u.uSize.value = size * s.viewport.dpr;
     (u.uColor.value as THREE.Color).lerp(new THREE.Color(color), 0.1);
     (u.uAccent.value as THREE.Color).lerp(new THREE.Color(accent ?? color), 0.1);
   });
