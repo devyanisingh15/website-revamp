@@ -44,7 +44,7 @@ const vert = /* glsl */ `
     pos.y += lit * (0.06 + sin(uTime * 2.0 + aSeed * 20.0) * 0.03);
     vec4 mv = modelViewMatrix * vec4(pos, 1.0);
     gl_Position = projectionMatrix * mv;
-    gl_PointSize = uSize * (0.6 + aSeed * 0.5) * (1.0 + lit * 0.35) / -mv.z;
+    gl_PointSize = uSize * (0.6 + aSeed * 0.5) * (1.0 + lit * 0.15) / -mv.z;
     vLit = lit;
     vSeed = aSeed;
   }
@@ -57,7 +57,8 @@ const frag = /* glsl */ `
   void main() {
     float d = length(gl_PointCoord - 0.5);
     if (d > 0.5) discard;
-    vec3 c = mix(uPowder * (0.75 + vSeed * 0.35), uLit, vLit);
+    vec3 base = mix(uPowder, vec3(1.0), 0.18) * (0.85 + vSeed * 0.4);
+    vec3 c = mix(base, uLit, vLit * 0.9);
     gl_FragColor = vec4(c, smoothstep(0.5, 0.2, d));
   }
 `;

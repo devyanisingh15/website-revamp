@@ -43,11 +43,11 @@
   --font-mono: 'JetBrains Mono', ui-monospace, SFMono-Regular, Menlo, monospace;
 
   /* Fluid type scale */
-  --text-display-xl: clamp(3rem, 1.2rem + 7vw, 8.25rem);
+  --text-display-xl: clamp(2.25rem, 0.5rem + 8vw, 8.25rem);
   --text-display-xl--line-height: 0.86;
-  --text-display-lg: clamp(2.6rem, 1.3rem + 5.2vw, 6.25rem);
+  --text-display-lg: clamp(2.1rem, 0.9rem + 5.4vw, 6.25rem);
   --text-display-lg--line-height: 0.9;
-  --text-display-md: clamp(2.1rem, 1.3rem + 3.3vw, 4.25rem);
+  --text-display-md: clamp(1.9rem, 1.1rem + 3.4vw, 4.25rem);
   --text-display-md--line-height: 0.95;
   --text-display-sm: clamp(1.6rem, 1.15rem + 1.8vw, 2.6rem);
   --text-display-sm--line-height: 1;

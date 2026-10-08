@@ -81,7 +81,9 @@ export function Hero() {
               label={`3D Biozyme Performance Whey tub in ${flavour.name}. Drag to rotate; scrolling opens the lid and releases a burst of powder. The same information is listed in the proof points beside it.`}
               fallback={
                 <div className="grid size-full place-items-center">
-                  <ProductArt art={product.art} band={flavour.color} protein={25} className="h-[min(62vh,560px)] w-auto max-w-full animate-[rise_1s_var(--ease-out-expo)_both] drop-shadow-[0_40px_60px_rgba(0,0,0,.6)]" title={`${product.shortName} tub, ${flavour.name}`} />
+                  <div className="aspect-[200/260] h-[min(56vh,520px)] max-h-full max-w-full animate-[rise_1s_var(--ease-out-expo)_both] drop-shadow-[0_40px_60px_rgba(0,0,0,.6)]">
+                    <ProductArt art={product.art} band={flavour.color} protein={25} title={`${product.shortName} tub, ${flavour.name}`} />
+                  </div>
                 </div>
               }
             >

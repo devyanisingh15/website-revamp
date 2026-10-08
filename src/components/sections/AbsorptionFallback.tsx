@@ -4,7 +4,7 @@ import { cx } from '@/lib/format';
  * Static 4-state diagram used when 3D is unavailable or motion is reduced.
  * Carries the same story as the scroll-scrubbed scene.
  */
-export function AbsorptionFallback({ stages, active, className }: { stages: { title: string }[]; active?: number; className?: string }) {
+export function AbsorptionFallback({ stages, active, className, start = 0 }: { stages: { title: string }[]; active?: number; className?: string; start?: number }) {
   const dots = (n: number, f: (i: number) => [number, number], color = '#efe6d4') =>
     Array.from({ length: n }).map((_, i) => {
       const [x, y] = f(i);
@@ -52,12 +52,12 @@ export function AbsorptionFallback({ stages, active, className }: { stages: { ti
   return (
     <ol className={cx('grid grid-cols-2 gap-3 md:grid-cols-4', className)}>
       {stages.map((s, i) => (
-        <li key={s.title} className={cx('rounded-md border p-3 transition-colors', active === i ? 'border-blaze-500/60 bg-white/[0.03]' : 'hairline')}>
+        <li key={s.title} className={cx('rounded-md border p-3 transition-colors', active === start + i ? 'border-blaze-500/60 bg-white/[0.03]' : 'hairline')}>
           <svg viewBox="0 0 120 100" className="w-full" aria-hidden>
-            {panels[i]}
+            {panels[start + i]}
           </svg>
           <p className="mt-2 font-mono text-[11px] uppercase tracking-wider text-bone-400">
-            <span className="text-blaze-500">0{i + 1}</span> {s.title}
+            <span className="text-blaze-500">0{start + i + 1}</span> {s.title}
           </p>
         </li>
       ))}

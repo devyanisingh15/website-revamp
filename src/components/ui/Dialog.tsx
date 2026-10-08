@@ -35,7 +35,8 @@ export function Dialog({
     const prevOverflow = document.body.style.overflow;
     document.body.style.overflow = 'hidden';
     const t = setTimeout(() => {
-      const first = panel.current?.querySelector<HTMLElement>('[data-autofocus], button, a, input, select, textarea');
+      const first =
+        panel.current?.querySelector<HTMLElement>('[data-autofocus]') ?? panel.current?.querySelector<HTMLElement>('button, a, input, select, textarea');
       first?.focus();
     }, 20);
     const onKey = (e: KeyboardEvent) => {

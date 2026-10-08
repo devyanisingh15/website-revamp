@@ -10,7 +10,7 @@ export function Logo({ className, tone = 'light' }: { className?: string; tone?:
         <path d="M6 21V7h3.6l4.4 6.2L18.4 7H22v14h-3.6v-7.4L14 19.6l-4.4-6V21z" fill="#fff" />
       </svg>
       <span
-        className={cx('text-[17px] font-extrabold uppercase leading-none tracking-[-0.02em]', tone === 'light' ? 'text-bone-100' : 'text-ink-950')}
+        className={cx('text-[15px] sm:text-[17px] font-extrabold uppercase leading-none tracking-[-0.02em]', tone === 'light' ? 'text-bone-100' : 'text-ink-950')}
         style={{ fontVariationSettings: "'wdth' 120" }}
       >
         Muscle<span className="text-blaze-500">Blaze</span>

@@ -75,7 +75,7 @@ export function Header() {
         )}
         onMouseLeave={scheduleClose}
       >
-        <div className="container-x flex h-[var(--header-h)] items-center gap-4">
+        <div className="container-x flex h-[var(--header-h)] items-center gap-1 sm:gap-4">
           <button className="-ml-2 grid size-11 place-items-center rounded-sm lg:hidden" aria-label="Open menu" onClick={() => setMobileOpen(true)}>
             <Menu className="size-5" />
           </button>
@@ -112,7 +112,7 @@ export function Header() {
             </ul>
           </nav>
 
-          <div className="ml-auto flex items-center gap-1">
+          <div className="ml-auto flex items-center sm:gap-1">
             <button
               onClick={() => setSearchOpen(true)}
               className="hidden h-10 items-center gap-3 rounded-sm border hairline px-3 text-sm text-bone-400 transition-colors hover:border-white/30 hover:text-bone-100 md:flex"
@@ -122,13 +122,13 @@ export function Header() {
               <span className="pr-6">Search whey, creatine…</span>
               <kbd className="rounded-xs border hairline px-1.5 font-mono text-[10px]">/</kbd>
             </button>
-            <button onClick={() => setSearchOpen(true)} className="grid size-11 place-items-center rounded-sm md:hidden" aria-label="Search products">
+            <button onClick={() => setSearchOpen(true)} className="grid size-10 place-items-center rounded-sm md:hidden" aria-label="Search products">
               <Search className="size-5" />
             </button>
-            <Link to="/account" className="grid size-11 place-items-center rounded-sm hover:bg-white/5" aria-label="Account">
+            <Link to="/account" className="grid size-10 sm:size-11 place-items-center rounded-sm hover:bg-white/5" aria-label="Account">
               <User className="size-5" />
             </Link>
-            <Link to="/cart" id="cart-target" className="relative grid size-11 place-items-center rounded-sm hover:bg-white/5" aria-label={`Cart, ${totals.count} item${totals.count === 1 ? '' : 's'}`}>
+            <Link to="/cart" id="cart-target" className="relative grid size-10 sm:size-11 place-items-center rounded-sm hover:bg-white/5" aria-label={`Cart, ${totals.count} item${totals.count === 1 ? '' : 's'}`}>
               <ShoppingBag className="size-5" />
               {totals.count > 0 && (
                 <span className="absolute right-1 top-1 grid min-w-[18px] place-items-center rounded-full bg-blaze-500 px-1 font-mono text-[10px] font-semibold leading-[18px] text-white">

@@ -100,8 +100,8 @@ function Viewer({ tub, model3d, hotspots, focus, onFocus, zoomStep, rotateStep }
       <OrbitControls
         ref={controls as never}
         enablePan={false}
-        minDistance={4}
-        maxDistance={9}
+        minDistance={5.5}
+        maxDistance={12}
         minPolarAngle={Math.PI * 0.25}
         maxPolarAngle={Math.PI * 0.62}
         onStart={() => (interacting.current = true)}
@@ -113,7 +113,7 @@ function Viewer({ tub, model3d, hotspots, focus, onFocus, zoomStep, rotateStep }
 
 export default function TubViewerScene({ active, onReady, ...rest }: TubViewerProps & SceneProps) {
   return (
-    <CanvasShell active={active} onReady={onReady} camera={{ position: [0, 0.6, 6.5], fov: 30 }} interactive>
+    <CanvasShell active={active} onReady={onReady} camera={{ position: [0, 0.8, 9], fov: 30 }} interactive>
       <StudioLights accent={rest.tub.band} />
       <Viewer {...rest} />
     </CanvasShell>

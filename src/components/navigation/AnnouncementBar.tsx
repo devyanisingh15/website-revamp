@@ -16,9 +16,9 @@ export function AnnouncementBar() {
       <p className="sr-only md:hidden">{ANNOUNCEMENT}</p>
       <div className="flex h-full w-max animate-marquee items-center md:hidden" aria-hidden>
         {[0, 1].map((k) => (
-          <div key={k} className="flex items-center">
+          <div key={k} className="flex shrink-0 items-center">
             {items.map((t) => (
-              <span key={t + k} className="flex items-center gap-4 px-4 font-mono text-[11px] uppercase tracking-[0.14em]">
+              <span key={t + k} className="flex shrink-0 items-center gap-4 whitespace-nowrap px-4 font-mono text-[11px] uppercase tracking-[0.14em]">
                 <span className="size-1 rounded-full bg-blaze-500" />
                 {t}
               </span>

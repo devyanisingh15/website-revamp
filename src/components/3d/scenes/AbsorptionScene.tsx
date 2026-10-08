@@ -50,12 +50,12 @@ const vert = /* glsl */ `
     vec4 mv = modelViewMatrix * vec4(pos, 1.0);
     gl_Position = projectionMatrix * mv;
     float isB = step(0.5, aKind) * uShowBcaa;
-    gl_PointSize = uSize * (0.6 + aSeed * 0.6) * (1.0 + isB * 0.4 * s2) / -mv.z;
+    gl_PointSize = uSize * (0.6 + aSeed * 0.6) * (1.0 + isB * 0.4 * s2) * (1.0 - 0.45 * s3) / -mv.z;
     vec3 c = uPowder;
     c = mix(c, uBcaa, isB * s2);
     c = mix(c, uMuscle, s3 * (1.0 - wasted) * (1.0 - isB * 0.5));
     vColor = c;
-    vAlpha = 1.0 - wasted * s3 * 0.85;
+    vAlpha = (1.0 - wasted * s3 * 0.85) * (1.0 - 0.3 * s3 * (1.0 - wasted));
   }
 `;
 

@@ -49,10 +49,11 @@ export function ArticleCover({ motif, className }: { motif: Article['motif']; cl
 
 export function ArticleCard({ article, tone = 'dark', size = 'md' }: { article: Article; tone?: 'dark' | 'light'; size?: 'md' | 'lg' }) {
   return (
-    <article className="group relative">
-      <div className={cx('overflow-hidden rounded-md', size === 'lg' ? 'aspect-[16/10]' : 'aspect-[4/3]')}>
+    <article className={cx('group relative', size === 'lg' && 'md:grid md:grid-cols-12 md:items-end md:gap-10')}>
+      <div className={cx('overflow-hidden rounded-md', size === 'lg' ? 'aspect-[16/10] md:col-span-7' : 'aspect-[4/3]')}>
         <ArticleCover motif={article.motif} className="transition-transform duration-700 ease-[var(--ease-out-expo)] group-hover:scale-105" />
       </div>
+      <div className={cx(size === 'lg' && 'md:col-span-5')}>
       <div className="mt-4 flex items-center gap-3 font-mono text-[11px] uppercase tracking-wider opacity-70">
         <span className="text-blaze-500">{article.topic}</span>
         <span aria-hidden>·</span>
@@ -63,6 +64,7 @@ export function ArticleCard({ article, tone = 'dark', size = 'md' }: { article: 
           {article.title}
         </Link>
       </h3>
+      </div>
       <ArrowUpRight className={cx('absolute right-3 top-3 size-9 rounded-full p-2 opacity-0 transition-opacity group-hover:opacity-100', tone === 'dark' ? 'bg-bone-100 text-ink-950' : 'bg-ink-950 text-bone-100')} aria-hidden />
     </article>
   );
