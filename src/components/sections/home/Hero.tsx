@@ -53,12 +53,12 @@ export function Hero() {
               <span className="size-1.5 rounded-full bg-proof-400" aria-hidden />
               India’s first clinically tested whey
             </p>
-            <h1 id="hero-title" className="display mt-4 text-display-xl md:mt-6">
+            <h1 id="hero-title" className="display mt-4 text-[clamp(2rem,0.4rem+6.8vw,7rem)] leading-[0.86] md:mt-6">
               Proof in
               <br />
               Every <span className="text-blaze-500">Scoop.</span>
             </h1>
-            <p className="mt-5 max-w-[44ch] text-[15px] leading-relaxed text-bone-200 md:mt-7 md:text-lede">
+            <p className="mt-5 max-w-[44ch] text-[14px] leading-relaxed text-bone-200 md:mt-7 md:text-[clamp(1rem,0.9rem+0.4vw,1.2rem)]">
               Biozyme whey is clinically tested on Indian bodies for 50% higher protein absorption. Spin it, scan it, see the lab report.
             </p>
             <div className="mt-6 hidden flex-wrap gap-3 md:mt-9 md:flex">
