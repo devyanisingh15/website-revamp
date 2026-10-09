@@ -1,15 +1,17 @@
 import { useEffect, useMemo, useRef } from 'react';
 import { useFrame } from '@react-three/fiber';
+import { useTexture } from '@react-three/drei';
 import * as THREE from 'three';
-import { CONTAINER } from '../config/assets';
+import { CONTAINER, productAssets } from '../config/assets';
 import { useRig } from '../rig';
-import { powderBump } from '@/components/3d/real/textures';
 
 /**
- * PROCEDURAL POWDER BED (the supplied powder GLB has no usable powder geometry)
- * A polar-grid surface with granular relief, colour variation and a crater that
- * deepens where the scoop digs — plus instanced granules for the macro shot.
- * Reads as granular powder (not smoke) under shallow depth of field.
+ * POWDER BED (the supplied powder GLB has no usable powder geometry)
+ * A displaced surface with a crater that deepens where the scoop digs. Its
+ * texture is cut from the supplied macro photo of real chocolate powder
+ * (albedo + height, see productAssets.powderAlbedo), so the grain, colour and
+ * clumping match the reference. Instanced granules and soft rounded clumps sit
+ * on top for parallax in the macro shot.
  */
 const RADIUS = 0.214;
 export const SCOOP_SPOT = new THREE.Vector2(0.035, 0.02); // where the scoop digs (x, z)
@@ -88,12 +90,7 @@ export function PowderBed() {
     return g;
   }, [quality]);
 
-  const bump = useMemo(() => {
-    const t = powderBump().clone();
-    t.repeat.set(10, 10);
-    t.needsUpdate = true;
-    return t;
-  }, []);
+  const [albedo, height] = usePowderTextures(3.2);
 
   const relief = (c: number) => {
     const pos = geom.attributes.position as THREE.BufferAttribute;
@@ -104,7 +101,7 @@ export function PowderBed() {
   useEffect(() => relief(0), [geom]); // eslint-disable-line react-hooks/exhaustive-deps
 
   // Granules scattered over the surface — what sells "powder" in the macro shot
-  const granuleCount = quality === 'high' ? 2600 : 500;
+  const granuleCount = quality === 'high' ? 1400 : 300;
   const granules = useRef<THREE.InstancedMesh>(null);
   const granuleData = useMemo(
     () =>
@@ -114,6 +111,17 @@ export function PowderBed() {
         return { x: Math.cos(a) * r, z: Math.sin(a) * r, s: 0.0008 + hash(i, 4.1) ** 3 * 0.0022, rot: hash(i, 2.2) * 6, tint: 0.82 + hash(i, 6.6) * 0.3 };
       }),
     [granuleCount],
+  );
+  const clumpCount = quality === 'high' ? 70 : 24;
+  const clumps = useRef<THREE.InstancedMesh>(null);
+  const clumpData = useMemo(
+    () =>
+      Array.from({ length: clumpCount }, (_, i) => {
+        const r = Math.sqrt(hash(i, 11.3)) * RADIUS * 0.9;
+        const a = hash(i, 5.9) * Math.PI * 2;
+        return { x: Math.cos(a) * r, z: Math.sin(a) * r, s: 0.004 + hash(i, 8.8) ** 2.5 * 0.011, rot: hash(i, 3.3) * 6 };
+      }),
+    [clumpCount],
   );
   const placeGranules = (c: number) => {
     const im = granules.current;
@@ -131,8 +139,21 @@ export function PowderBed() {
     });
     im.instanceMatrix.needsUpdate = true;
     if (im.instanceColor) im.instanceColor.needsUpdate = true;
+    // Soft rounded clumps (the photo shows 3–10 mm aggregates on the surface)
+    const cm = clumps.current;
+    if (!cm) return;
+    clumpData.forEach((g, i) => {
+      // crater swallows clumps that sit inside it
+      const d = Math.hypot(g.x - SCOOP_SPOT.x, g.z - SCOOP_SPOT.y);
+      const sink = d < 0.05 ? c : 0;
+      e.set(g.rot, g.rot * 2.1, g.rot * 0.4);
+      q.setFromEuler(e);
+      m.compose(new THREE.Vector3(g.x, powderHeight(g.x, g.z, c) + g.s * (0.35 - sink), g.z), q, new THREE.Vector3(g.s, g.s * 0.72, g.s * 0.9));
+      cm.setMatrixAt(i, m);
+    });
+    cm.instanceMatrix.needsUpdate = true;
   };
-  useEffect(() => placeGranules(0), [granuleData]); // eslint-disable-line react-hooks/exhaustive-deps
+  useEffect(() => placeGranules(0), [granuleData, clumpData]); // eslint-disable-line react-hooks/exhaustive-deps
 
   useFrame(() => {
     const c = crater.current ?? 0;
@@ -146,14 +167,49 @@ export function PowderBed() {
   });
 
   const granuleGeo = useMemo(() => new THREE.IcosahedronGeometry(1, 0), []);
+  const clumpGeo = useMemo(() => powderClumpGeometry(), []);
   return (
     <group position={[0, CONTAINER.powderY, 0]}>
       <mesh ref={mesh} geometry={geom} receiveShadow>
-        <meshStandardMaterial color={powderColor} vertexColors roughness={1} bumpMap={bump} bumpScale={1.4} />
+        <meshStandardMaterial map={albedo} vertexColors roughness={1} bumpMap={height} bumpScale={1.1} />
       </mesh>
       <instancedMesh ref={granules} args={[granuleGeo, undefined, granuleCount]}>
-        <meshStandardMaterial color={powderColor} roughness={0.95} flatShading />
+        <meshStandardMaterial color={powderColor} roughness={0.95} />
+      </instancedMesh>
+      <instancedMesh ref={clumps} args={[clumpGeo, undefined, clumpCount]} castShadow>
+        <meshStandardMaterial map={albedo} roughness={1} bumpMap={height} bumpScale={1.2} />
       </instancedMesh>
     </group>
   );
+}
+
+/** Photo powder textures, tiled `repeat` times across a 0–1 UV range. */
+export function usePowderTextures(repeat: number) {
+  const [a, h] = useTexture([productAssets.powderAlbedo, productAssets.powderHeight]);
+  return useMemo(() => {
+    const out = [a.clone(), h.clone()];
+    out.forEach((t, i) => {
+      t.wrapS = t.wrapT = THREE.RepeatWrapping;
+      t.repeat.set(repeat, repeat);
+      t.colorSpace = i === 0 ? THREE.SRGBColorSpace : THREE.NoColorSpace;
+      t.anisotropy = 8;
+      t.needsUpdate = true;
+    });
+    return out as [THREE.Texture, THREE.Texture];
+  }, [a, h, repeat]);
+}
+
+/** A lumpy, rounded aggregate — reads as compacted powder, not a faceted rock. */
+export function powderClumpGeometry() {
+  const g = new THREE.IcosahedronGeometry(1, 3);
+  const pos = g.attributes.position as THREE.BufferAttribute;
+  const v = new THREE.Vector3();
+  for (let i = 0; i < pos.count; i++) {
+    v.fromBufferAttribute(pos, i);
+    const n = (vnoise(v.x * 2.2 + 4, v.y * 2.2 + v.z * 1.7) - 0.5) * 0.45 + (vnoise(v.x * 6 - v.z * 3, v.y * 6 + 2) - 0.5) * 0.16;
+    v.multiplyScalar(1 + n);
+    pos.setXYZ(i, v.x, v.y, v.z);
+  }
+  g.computeVertexNormals();
+  return g;
 }

@@ -95,6 +95,10 @@ for (const [src, out, width, quality] of [
   ['product-label.png', 'product-label-mobile.webp', 2048, 86],
   ['cap-label.png', 'cap-label.webp', 2048, 90],
   ['cap-top.png', 'cap-top.webp', 1024, 88],
+  ['powder-albedo.png', 'powder-albedo.webp', 512, 86],
+  ['powder-height.png', 'powder-height.webp', 512, 90],
+  ['hand-top.png', 'hand-top.webp', 716, 88],
+  ['hand-bottom.png', 'hand-bottom.webp', 821, 88],
 ]) {
   await sharp(IMG(src)).resize({ width }).webp({ quality, alphaQuality: 90 }).toFile(IMG(out));
   console.log(`${out.padEnd(34)} ${kb(new URL(out, OUT))}`);

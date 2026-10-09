@@ -77,7 +77,7 @@ A scroll-driven 3D commercial in `src/components/ProductAnimation/`. Scroll is t
 |---|---|
 | 0–10% | Brand intro: logo in the dark |
 | 10–25% | Product reveal: dolly in on the jar, label turns to camera |
-| 25–40% | Interaction: crane up, cap unscrews and is set down |
+| 25–40% | Interaction: one hand steadies the jar, the other twists the cap off in three re-grips and sets it on the counter |
 | 40–55% | Macro powder: top-down macro, shallow depth of field, scoop digs in |
 | 55–70% | Scoop and pour: scoop lifts, tilts, granules fall into the shaker |
 | 70–82% | Shaker: water fills, cap screws on, shake, powder dissolves |
@@ -91,14 +91,19 @@ ProductAnimation/
   config/assets.ts              every file path + measured model dimensions (single place to swap assets)
   config/timeline.ts            beat ranges and easing helpers
   scenes/                       one file per beat (DOM overlays are three-free so they stay in the main bundle)
-  components/                   ProductModel, ShakerModel, PowderBed, PowderParticles, CinematicCamera, ProductLighting, Effects
+  components/                   ProductModel, ShakerModel, PowderBed, Scoop, PowderParticles, CinematicCamera, ProductLighting, Effects
   styles/product-animation.css
 ```
 
 **Asset findings (from inspecting the supplied GLBs):**
 - `protein_supplement_jar.glb`: separate body and cap meshes with usable UVs. The label is a fitted cylindrical sleeve sized from the measured body radius (`LABEL_SLEEVE`), so the artwork never stretches.
 - `shaker_bottle.glb`: separate `cup` / `cap` / `lid` nodes with 4K PBR textures. These are resized to 1024 (desktop) and 512 (mobile) WebP. The green cap is recoloured to brand black.
-- `protein_powder.glb`: no usable powder surface (its upper meshes are thread rings). Powder is procedural: a displaced granular bed with instanced granules, plus a deterministic ballistic particle stream that scrubs both ways with scroll.
+- `protein_powder.glb`: no usable powder surface (its upper meshes are thread rings). The powder is a displaced bed and a deterministic ballistic particle stream that scrubs both ways with scroll.
+
+**Reference photos and video** (`assets-src/reference/`, processed by `npm run reference-assets`, then `npm run assets`):
+- **Hands** (`hands-opening-tub.jpg`): the two hands are keyed off the black ground and green-screen spill, the cream jar and lid are cut away, and the cut edges fade into shadow. They are composited as camera-facing cards registered to the photo (`HAND_PHOTO`): the fingertips and thumb sit on the 3D cap's rims and the lower hand wraps the jar. This holds up because the camera stays near the photo's angle during that beat. It is a 2.5D composite, not a rigged 3D hand, so it would break under large camera orbits.
+- **Powder** (`powder-scoop.jpg`): a tileable albedo plus height map cut from the photo is used on the powder bed, the soft rounded clumps and the heaped scoop. The powder colour is sampled from it. The scoop is now clear plastic like the photo.
+- **Lighting** (studio video): a black-walled room with a warm square LED panel, cool slanted overhead tubes and a polished concrete floor. It is rebuilt with Lightformers, matching direct lights (warm key, cool top, warm and cool rims) and defocused practicals behind the set that catch a little bloom. Soft grounding shadows follow the jar, the shaker and the resting cap.
 
 **Pipeline:**
 - Put the source GLBs in `assets-src/` as `protein-container.source.glb` and `shaker-bottle.source.glb`. These are gitignored.
@@ -108,15 +113,15 @@ ProductAnimation/
 - The Draco decoder is self-hosted in `public/draco/`.
 
 **Swappable slots** (`config/assets.ts`):
-- `environment`: CC0 *studio_small_03* HDRI.
+- `environment`: `null` (the Lightformer room). Set it to `/assets/environment.hdr` (CC0 *studio_small_03*) for a brighter photographic studio.
 - `logo`: placeholder wordmark.
 - `poster`: rendered from the hero frame. It is shown while the 3D loads and used for reduced motion and no-WebGL.
 - `fallbackVideo`: `null`. If set, it replaces the poster on low-end devices.
-- `handFootage`: `null`. No hand model was supplied. Drop transparent WebM/HEVC footage here and it scrubs in sync with the cap motion with no scene changes.
+- `hands`: photo cut-outs (above). `handFootage`: `null`. Transparent WebM/HEVC footage set here scrubs in sync with the cap motion and can replace the cards for full finger motion.
 
 **Quality tiers:**
-- Desktop: HDRI, ambient occlusion (N8AO), depth of field, film grain, 2600 granules.
-- Mobile / low-memory: simplified GLBs, half-resolution depth of field, Lightformer lighting, about 20% of the particles, calmer camera.
+- Desktop: ambient occlusion (N8AO), depth of field, bloom, film grain, transmissive scoop, 1400 granules and 70 clumps.
+- Mobile / low-memory: simplified GLBs, half-resolution depth of field, no AO, bloom or grain, see-through (non-transmissive) scoop, about 20–30% of the particles, calmer camera. Portrait screens re-centre every shot on the product.
 - `PerformanceMonitor` steps down DPR, then effects, then falls back to the poster after sustained low fps. `?pa-nofallback` disables that final step for QA.
 - `prefers-reduced-motion` and no-WebGL get the static poster hero.
 

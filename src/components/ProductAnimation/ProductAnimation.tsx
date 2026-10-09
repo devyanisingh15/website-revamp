@@ -120,7 +120,7 @@ export function ProductAnimation() {
   const raw = useRef(0);
   const smooth = useRef(0);
   const st = useRef<{ start: number; end: number } | null>(null);
-  const powderColor = '#8a6650'; // Rich Milk Chocolate powder (lighter than the flavour swatch, like real powder)
+  const powderColor = '#9a6047'; // sampled from the supplied chocolate-powder photo (mean ≈ rgb 163 97 68), slightly deepened for the dark set
   void BIOZYME_FLAVOURS;
 
   useEffect(() => setWebgl(hasWebGL()), []);

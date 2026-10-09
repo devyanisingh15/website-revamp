@@ -26,8 +26,25 @@ export const productAssets = {
   labelSource: '/assets/product-label.png',
   capLabelSource: '/assets/cap-label.png',
   capTopSource: '/assets/cap-top.png',
+  /**
+   * Powder surface, cut from the supplied macro photo of chocolate powder in a scoop:
+   * lighting flattened and made tileable (albedo), plus a high-passed height map.
+   */
+  powderAlbedo: '/assets/powder-albedo.webp',
+  powderHeight: '/assets/powder-height.webp',
+  /**
+   * Hands, keyed from the supplied photo of hands opening a tub (black ground, green
+   * spill removed, jar and lid cut away). Composited as camera-facing cards that
+   * grip the 3D cap and jar — see components/HandRig.tsx and HAND_PHOTO below.
+   */
+  hands: { top: '/assets/hand-top.webp', bottom: '/assets/hand-bottom.webp' },
   logo: '/assets/logo.svg',
-  environment: '/assets/environment.hdr',
+  /**
+   * OPTIONAL HDRI layered under the Lightformer room (see ProductLighting). null keeps
+   * the black-walled studio of the reference video; '/assets/environment.hdr'
+   * (CC0 studio_small_03) adds a brighter photographic studio.
+   */
+  environment: null as string | null,
   /** Draco decoder (self-hosted) */
   draco: '/draco/',
   /** Static composition shown before 3D loads, for reduced motion, and as the low-performance fallback */
@@ -82,4 +99,26 @@ export const SHAKER = {
   innerTop: 0.152,
   cupHeight: 333.7 * 0.00172,
   position: [0.62, 0, 0.08] as [number, number, number],
+};
+
+/**
+ * Hand photo registration (pixels in the 1280×1181 source photo).
+ * The photo's jar is 610 px wide → our jar diameter (2 × bodyRadius), which sets
+ * the px → metre scale; its lid (480 px) matches our cap (0.80 of the body width).
+ * Each cut-out is placed so its contact points land on the 3D cap / jar.
+ */
+export const HAND_PHOTO = {
+  pxToM: (CONTAINER.bodyRadius * 2) / 610,
+  top: {
+    rect: { x: 113, y: 10, w: 716, h: 438 },
+    /** fingertips (near-left rim) and thumb (far-right rim) gripping the lid */
+    fingers: { x: 360, y: 415 },
+    thumb: { x: 783, y: 250 },
+  },
+  bottom: {
+    rect: { x: 459, y: 569, w: 821, h: 570 },
+    /** where the fingertips wrap the jar's left silhouette, and the jar axis in the photo */
+    fingertips: { x: 478, y: 820 },
+    jarAxisX: 655,
+  },
 };

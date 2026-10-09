@@ -18,7 +18,7 @@ export interface Rig {
   shaker: React.RefObject<THREE.Group | null>;
   shakerCap: React.RefObject<THREE.Group | null>;
   scoop: React.RefObject<THREE.Group | null>;
-  scoopMound: React.RefObject<THREE.Mesh | null>;
+  scoopMound: React.RefObject<THREE.Group | null>;
   /** Depth of field: world-space focus point and bokeh strength, driven by the camera */
   focus: THREE.Vector3;
   bokeh: React.RefObject<number>;

@@ -6,7 +6,7 @@ import { ease } from '../config/timeline';
 import { CONTAINER } from '../config/assets';
 import { SCOOP_SPOT } from '../components/PowderBed';
 import { PowderParticles } from '../components/PowderParticles';
-import { ScoopModel } from '@/components/3d/real/models';
+import { Scoop } from '../components/Scoop';
 
 /**
  * SCENE 5 — SCOOP + POUR (≈44–72%)
@@ -41,7 +41,7 @@ function pose(p: number, out: { pos: THREE.Vector3; yaw: number; tilt: number })
 }
 
 export function PourScene() {
-  const { progress, scoop, scoopMound, crater, powderColor } = useRig();
+  const { progress, scoop, scoopMound, crater } = useRig();
   const tilt = useRef<THREE.Group>(null);
   const tmp = useMemo(() => ({ pos: new THREE.Vector3(), yaw: 0, tilt: 0 }), []);
 
@@ -69,7 +69,7 @@ export function PourScene() {
       <group ref={scoop} visible={false}>
         <group ref={tilt}>
           <group scale={SCALE}>
-            <ScoopModel powder={powderColor} moundRef={scoopMound} />
+            <Scoop fillRef={scoopMound} />
           </group>
         </group>
       </group>
