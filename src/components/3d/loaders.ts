@@ -4,7 +4,7 @@
  */
 export const loadAbsorption = () => import('./scenes/AbsorptionScene');
 export const loadCarousel = () => import('./scenes/CarouselScene');
-export const loadSwirl = () => import('./scenes/PowderSwirlScene');
+export const loadFlavourBurst = () => import('./scenes/FlavourBurstScene');
 export const loadFigure = () => import('./scenes/FigureScene');
 export const loadTubViewer = () => import('./scenes/TubViewerScene');
 export const loadScoop = () => import('./scenes/ScoopScene');

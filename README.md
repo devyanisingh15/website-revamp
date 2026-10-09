@@ -125,6 +125,18 @@ ProductAnimation/
 - `PerformanceMonitor` steps down DPR, then effects, then falls back to the poster after sustained low fps. `?pa-nofallback` disables that final step for QA.
 - `prefers-reduced-motion` and no-WebGL get the static poster hero.
 
+## Flavour scene ("Tastes Like a Reward")
+
+`src/components/3d/scenes/FlavourBurstScene.tsx` puts the Biozyme tub in a splash of the selected flavour, with that flavour's ingredients in the air around it.
+- **Source artwork:** one transparent artwork per flavour in `assets-src/reference/flavours/<flavour-id>.webp`.
+- **Splitting:** `npm run flavour-assets` separates each artwork into its elements (splashes, nuts, chunks, leaves, drops). It writes a texture atlas plus a per-pixel element-id map to `public/assets/flavours/`, and a manifest to `src/data/flavour-elements.json`.
+- **Depth:** each element becomes a card at its own depth, scaled so the resting view matches the artwork exactly. Pointer movement and a slow camera drift give real parallax.
+- **No duplicates:** the id map ensures each card draws only its own element.
+- **Changing flavour:** the old ingredients burst outward, the tub spins once and comes round with the new flavour's label, and the new splash erupts from behind it.
+- **Fallbacks:** reduced motion and no-WebGL show the flavour artwork behind the pack image.
+- **Mobile layout:** the stage sits between the heading and the flavour list, so a tap visibly changes the scene.
+- **New or changed flavour:** add `<flavour-id>.webp` (transparent background, about 1536×1024) to `assets-src/reference/flavours/`, using an id from `src/data/flavours.ts`, then run `npm run flavour-assets`.
+
 ## Mock data and placeholders (all must be replaced)
 
 - **Prices:** `src/mocks/pricing.ts` holds round demo numbers so cart maths works. Every price shows a "Demo price" tag. Set `PRICE_MODE = 'placeholder'` to render `₹[price]` instead.

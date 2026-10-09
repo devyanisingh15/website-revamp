@@ -12,7 +12,8 @@
     "packshots": "node scripts/render-packshots.mjs",
     "assets": "node scripts/optimize-assets.mjs",
     "label-assets": "node scripts/generate-label-assets.mjs",
-    "reference-assets": "python3 -I scripts/key-reference-photos.py"
+    "reference-assets": "python3 -I scripts/key-reference-photos.py",
+    "flavour-assets": "python3 -I scripts/split-flavour-elements.py"
   },
   "dependencies": {
     "@fontsource-variable/archivo": "^5.3.0",
