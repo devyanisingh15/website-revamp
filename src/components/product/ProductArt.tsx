@@ -1,6 +1,8 @@
-import { useId } from 'react';
+import { useId, useState } from 'react';
 import type { ProductArt as Art } from '@/data/types';
 import { cx } from '@/lib/format';
+import { PRODUCTS } from '@/data/products';
+import PACKSHOTS from '@/data/packshots.json';
 
 /**
  * Parametric vector packshot. Serves as:
@@ -26,9 +28,51 @@ interface Props {
   className?: string;
   title?: string;
   shadow?: boolean;
+  /** Above-the-fold image: load eagerly with high fetch priority */
+  priority?: boolean;
 }
 
-export function ProductArt({ art, band = '#e8202a', protein, className, title, shadow = true }: Props) {
+const SHOTS = PACKSHOTS as Record<string, Record<string, string>>;
+
+/** Finds the rendered packshot for an art object (+ flavour colour), if one exists. */
+function packshotFor(art: Art, band?: string) {
+  const product = PRODUCTS.find((p) => p.art === art);
+  if (!product) return null;
+  const shots = SHOTS[product.id];
+  if (!shots) return null;
+  const flavour = product.flavours.find((f) => f.color === band);
+  return shots[flavour?.id ?? ''] ?? shots.default ?? Object.values(shots)[0] ?? null;
+}
+
+/**
+ * Product imagery. Uses the photo-real packshot rendered from the 3D pack
+ * models (public/packshots, `npm run packshots`); falls back to vector art
+ * for anything without a render yet.
+ */
+export function ProductArt(props: Props) {
+  const [failed, setFailed] = useState(false);
+  const src = packshotFor(props.art, props.band);
+  if (src && !failed) {
+    return (
+      <img
+        src={src}
+        alt={props.title ?? ''}
+        aria-hidden={props.title ? undefined : true}
+        width={800}
+        height={1040}
+        loading={props.priority ? 'eager' : 'lazy'}
+        fetchPriority={props.priority ? 'high' : 'auto'}
+        decoding="async"
+        draggable={false}
+        onError={() => setFailed(true)}
+        className={cx('block h-auto w-full select-none object-contain', props.className)}
+      />
+    );
+  }
+  return <VectorArt {...props} />;
+}
+
+function VectorArt({ art, band = '#e8202a', protein, className, title, shadow = true }: Props) {
   const uid = useId().replace(/:/g, '');
   const dark = lum(art.body) < 0.5;
   const ink = dark ? '#f2efe9' : '#0a0a0b';

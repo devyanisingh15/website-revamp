@@ -71,11 +71,13 @@ interface StageProps<P> {
   /** Keep 3D even with reduced motion (e.g. user-driven viewers with no autoplay) */
   allowReducedMotion?: boolean;
   className?: string;
+  /** Classes for the live canvas layer only (e.g. an edge-fade mask) */
+  canvasClassName?: string;
   /** Overlays (hints, hotspot legends) that sit above both fallback and canvas */
   children?: ReactNode;
 }
 
-export function Stage3D<P extends object>({ load, sceneProps, fallback, label, mobileLive, allowReducedMotion, className, children }: StageProps<P>) {
+export function Stage3D<P extends object>({ load, sceneProps, fallback, label, mobileLive, allowReducedMotion, className, canvasClassName, children }: StageProps<P>) {
   const id = useId();
   const reduced = useReducedMotion();
   const mobile = useIsMobile();
@@ -126,7 +128,7 @@ export function Stage3D<P extends object>({ load, sceneProps, fallback, label, m
         {fallback}
       </div>
       {shouldMount && (
-        <div className={cx('absolute inset-0 transition-opacity duration-700', ready ? 'opacity-100' : 'opacity-0')} aria-hidden>
+        <div className={cx('absolute inset-0 transition-opacity duration-700', ready ? 'opacity-100' : 'opacity-0', canvasClassName)} aria-hidden>
           <SceneBoundary onError={() => setFailed(true)}>
             <Suspense fallback={null}>
               <Scene {...sceneProps} active={active} onReady={() => setReady(true)} />

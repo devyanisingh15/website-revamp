@@ -1,6 +1,6 @@
 import { useSeo } from '@/hooks/useSeo';
 import { SEO } from '@/data/seo';
-import { Hero } from '@/components/sections/home/Hero';
+import { ProductAnimation } from '@/components/ProductAnimation/ProductAnimation';
 import { ValueStrip } from '@/components/sections/home/ValueStrip';
 import { BiozymeStory } from '@/components/sections/home/BiozymeStory';
 import { AuthenticitySection } from '@/components/sections/home/AuthenticitySection';
@@ -14,6 +14,7 @@ import { Newsletter } from '@/components/sections/home/Newsletter';
 
 /**
  * One continuous story in seven beats:
+ * (opens with the scroll-driven product film)
  * 01 the product → 02 the science → 03 the proof → 04 the range
  * → 05 your goal → 06 real people → 07 the offer
  */
@@ -21,7 +22,7 @@ export default function HomePage() {
   useSeo(SEO.home);
   return (
     <>
-      <Hero />
+      <ProductAnimation />
       <ValueStrip />
       <BiozymeStory />
       <AuthenticitySection />

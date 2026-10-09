@@ -2,7 +2,7 @@ import { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { ArrowRight } from 'lucide-react';
 import { Stage3D } from '@/components/3d/Stage3D';
-import { loadSwirl } from '@/components/3d/loaders';
+import { loadFlavourBurst } from '@/components/3d/loaders';
 import { BIOZYME_FLAVOURS } from '@/data/flavours';
 import { getProduct, PRIMARY_PRODUCT_ID } from '@/data/products';
 import { ProductArt } from '@/components/product/ProductArt';
@@ -17,14 +17,17 @@ export function FlavourWall() {
   return (
     <section aria-labelledby="flavour-title" className="relative overflow-hidden bg-ink-950 py-24 md:py-32">
       <div aria-hidden className="absolute inset-0 opacity-40 transition-[background] duration-1000" style={{ background: `radial-gradient(50% 60% at 70% 50%, ${f.color}55, transparent 70%)` }} />
-      <div className="container-x relative grid gap-12 lg:grid-cols-12 lg:items-center">
-        <div className="lg:col-span-5">
+      {/* Mobile order: heading → 3D stage → flavour list, so a tap visibly changes the scene */}
+      <div className="container-x relative grid gap-x-12 gap-y-8 lg:grid-cols-12 lg:grid-rows-[auto_1fr] lg:items-center">
+        <div className="order-1 lg:order-none lg:col-span-5 lg:row-start-1 lg:self-end">
           <h2 id="flavour-title" className="display text-display-lg">
             Tastes Like a <span style={{ color: f.family === 'vanilla' ? '#ead9b0' : f.color }} className="transition-colors duration-700">Reward</span>
           </h2>
           <p className="mt-6 max-w-[42ch] text-lede text-bone-200">From Rich Milk Chocolate to Kesar Pista Badam, pick a flavour you’ll actually look forward to.</p>
+        </div>
 
-          <div role="radiogroup" aria-label="Flavours" className="mt-10 border-t hairline" onKeyDown={(e) => radioKeyNav(e, BIOZYME_FLAVOURS.map((x) => x.id), id, setId)}>
+        <div className="order-3 lg:order-none lg:col-span-5 lg:col-start-1 lg:row-start-2 lg:self-start">
+          <div role="radiogroup" aria-label="Flavours" className="border-t hairline lg:mt-2" onKeyDown={(e) => radioKeyNav(e, BIOZYME_FLAVOURS.map((x) => x.id), id, setId)}>
             {BIOZYME_FLAVOURS.map((x, i) => (
               <button
                 key={x.id}
@@ -53,17 +56,17 @@ export function FlavourWall() {
           </Link>
         </div>
 
-        <div className="relative aspect-square lg:col-span-7">
+        <div className="relative order-2 -mx-4 aspect-square sm:mx-0 lg:order-none lg:col-span-7 lg:col-start-6 lg:row-span-2 lg:row-start-1">
           <Stage3D
-            load={loadSwirl}
-            sceneProps={{ color: f.color, accent: f.accent ?? f.color, notes: f.notes ?? [] }}
+            load={loadFlavourBurst}
+            sceneProps={{ flavourId: f.id }}
             mobileLive
             className="absolute inset-0"
-            label={`A swirl of ${f.name} powder with its ingredients (${(f.notes ?? []).join(', ')}) floating around it.`}
+            label={`The Biozyme tub in a splash of ${f.name}, with ${(f.notes ?? []).join(', ')} in the air around it.`}
             fallback={
               <div className="relative grid size-full place-items-center">
-                <div aria-hidden className="absolute size-[70%] rounded-full blur-3xl transition-[background] duration-700" style={{ background: `radial-gradient(circle, ${f.color}, ${f.accent ?? f.color}00 70%)` }} />
-                <div className="relative w-[42%]">
+                <img src={`/assets/flavours/${f.id}.webp`} alt="" aria-hidden width={1536} height={1024} loading="lazy" decoding="async" className="absolute inset-x-0 top-1/2 w-full -translate-y-1/2 transition-opacity duration-500" />
+                <div className="relative w-[38%] drop-shadow-2xl">
                   <ProductArt art={product.art} band={f.color} protein={25} title={`${product.shortName} in ${f.name}`} />
                 </div>
               </div>

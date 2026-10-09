@@ -9,7 +9,7 @@ import { ProductArt } from '@/components/product/ProductArt';
 import { cx } from '@/lib/format';
 
 const CATS = HOME_CATEGORY_IDS.map((id) => CATEGORIES.find((c) => c.id === id)!);
-const ITEMS = CATS.map((c) => ({ id: c.id, label: c.shortName.toUpperCase().replace(' & ', ' + '), body: c.tub, band: '#e8202a' }));
+const ITEMS = CATS.map((c) => ({ id: c.id, productId: productsInCategory(c.id)[0].id }));
 
 /**
  * "Pick Your Fuel" — 3D ring of tubs on capable desktops; an accessible

@@ -8,27 +8,37 @@
     "build": "node scripts/generate-sitemap.mjs && tsc -b && vite build",
     "sitemap": "node scripts/generate-sitemap.mjs",
     "preview": "vite preview",
-    "typecheck": "tsc -b --noEmit"
+    "typecheck": "tsc -b --noEmit",
+    "packshots": "node scripts/render-packshots.mjs",
+    "assets": "node scripts/optimize-assets.mjs",
+    "label-assets": "node scripts/generate-label-assets.mjs",
+    "reference-assets": "python3 -I scripts/key-reference-photos.py",
+    "flavour-assets": "python3 -I scripts/split-flavour-elements.py"
   },
   "dependencies": {
     "@fontsource-variable/archivo": "^5.3.0",
     "@fontsource/jetbrains-mono": "^5.3.0",
     "@react-three/drei": "10.1",
     "@react-three/fiber": "9.1",
+    "@react-three/postprocessing": "^3.0.4",
     "gsap": "3.13",
     "lucide-react": "^1.53.0",
+    "postprocessing": "6.37",
     "react": "19.1",
     "react-dom": "19.1",
     "react-router-dom": "7.6",
     "three": "^0.176.0"
   },
   "devDependencies": {
+    "@gltf-transform/cli": "^4.5.1",
     "@tailwindcss/vite": "4.1",
     "@types/node": "^22.20.5",
     "@types/react": "19.1",
     "@types/react-dom": "19.1",
     "@types/three": "^0.176.0",
     "@vitejs/plugin-react": "^4.7.0",
+    "playwright-core": "1.52",
+    "sharp": "^0.33.5",
     "tailwindcss": "4.1",
     "typescript": "5.8",
     "vite": "6.3"

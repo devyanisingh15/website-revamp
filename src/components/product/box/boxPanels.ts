@@ -64,6 +64,8 @@ export function labelRows(n: { protein: number | null; eaas: number | null; bcaa
   ];
 }
 
+import { drawMB, molecules, MB_YELLOW } from '@/components/3d/real/labelArt';
+
 const SANS = '"Archivo Variable", Archivo, system-ui, sans-serif';
 const MONO = '"JetBrains Mono", ui-monospace, monospace';
 
@@ -93,61 +95,83 @@ function brandStrip(g: CanvasRenderingContext2D, W: number, d: BoxData, y: numbe
 }
 
 function drawFront(g: CanvasRenderingContext2D, W: number, H: number, d: BoxData) {
-  const dark = lum(d.body) < 0.5;
-  const ink = dark ? '#f2efe9' : '#0a0a0b';
-  g.fillStyle = d.body;
+  // MuscleBlaze house style (as on the Biozyme tub): charcoal ground, molecule diagonal, MB monogram
+  const ground = g.createLinearGradient(0, 0, 0, H);
+  ground.addColorStop(0, '#45464b');
+  ground.addColorStop(1, '#2b2c30');
+  g.fillStyle = ground;
   g.fillRect(0, 0, W, H);
-  // subtle vertical sheen
-  const sheen = g.createLinearGradient(0, 0, W, 0);
-  sheen.addColorStop(0, 'rgba(255,255,255,0)');
-  sheen.addColorStop(0.35, 'rgba(255,255,255,0.06)');
-  sheen.addColorStop(1, 'rgba(0,0,0,0.18)');
-  g.fillStyle = sheen;
-  g.fillRect(0, 0, W, H);
+  g.save();
+  g.beginPath();
+  g.moveTo(W * 0.42, 0);
+  g.lineTo(W, 0);
+  g.lineTo(W, H * 0.58);
+  g.closePath();
+  const light = g.createLinearGradient(W * 0.5, 0, W, H * 0.5);
+  light.addColorStop(0, '#f4f4f5');
+  light.addColorStop(1, '#c9c9cd');
+  g.fillStyle = light;
+  g.fill();
+  g.clip();
+  molecules(g, W * 0.42, 0, W * 0.58, H * 0.58, 4);
+  g.restore();
 
-  g.textAlign = 'center';
-  g.fillStyle = dark ? 'rgba(242,239,233,.6)' : 'rgba(10,10,11,.6)';
-  g.font = `700 34px ${SANS}`;
-  g.letterSpacing = '12px';
-  g.fillText('MUSCLEBLAZE', W / 2, 150);
-
-  g.fillStyle = ink;
-  g.letterSpacing = '-4px';
-  g.font = `900 160px ${SANS}`;
-  g.fillText(d.label, W / 2, 360);
-  if (d.sub) {
-    g.fillStyle = d.band;
-    g.letterSpacing = '10px';
-    g.font = `600 46px ${MONO}`;
-    g.fillText(d.sub, W / 2, 440);
-  }
-
-  // Flavour band
-  g.fillStyle = d.band;
-  g.fillRect(0, 560, W, 420);
-  const bandInk = lum(d.band) > 0.55 ? '#0a0a0b' : '#ffffff';
-  g.fillStyle = bandInk;
-  g.letterSpacing = '6px';
-  g.font = `800 78px ${SANS}`;
-  g.fillText('WHEY PROTEIN', W / 2, 720);
+  const x = 70;
+  g.fillStyle = '#ffffff';
+  g.font = `800 40px ${SANS}`;
   g.letterSpacing = '2px';
-  g.font = `600 44px ${MONO}`;
-  g.fillText(d.flavourName.toUpperCase(), W / 2, 800);
+  g.fillText('MUSCLEBLAZE®', x, 130);
+  g.letterSpacing = '0px';
+  drawMB(g, x - 6, 400, 260, MB_YELLOW);
+  g.fillStyle = '#ffffff';
+  g.font = `800 96px ${SANS}`;
+  g.fillText(d.label, x, 530);
+  if (d.sub) g.fillText(d.sub, x, 630);
+  g.font = `900 170px ${SANS}`;
+  g.fillText('WHEY', x - 6, 810);
+
+  // Clinically tested badge
+  const bx = W - 160;
+  const by = 1000;
+  g.fillStyle = '#3d3e42';
+  g.beginPath();
+  g.arc(bx, by, 125, 0, Math.PI * 2);
+  g.fill();
+  g.strokeStyle = '#e9e9ec';
+  g.lineWidth = 8;
+  g.stroke();
+  g.fillStyle = '#ffffff';
+  g.textAlign = 'center';
+  g.font = `800 34px ${SANS}`;
+  g.fillText('CLINICALLY', bx, by - 40);
+  g.font = `600 20px ${SANS}`;
+  g.fillText('TESTED · HIGHER PROTEIN', bx, by - 6);
+  g.fillText('ABSORPTION BY', bx, by + 20);
+  g.font = `900 72px ${SANS}`;
+  g.fillText('50%', bx, by + 96);
+  g.textAlign = 'left';
+
+  // Protein callout + flavour strip
   const protein = d.rows.find((r) => r.id === 'protein')?.value;
   if (protein) {
+    g.fillStyle = '#ffffff';
     g.font = `900 120px ${SANS}`;
-    g.letterSpacing = '-2px';
-    g.fillText(`${protein}g`, W / 2, 930);
+    g.fillText(`${protein}g`, x, 1060);
+    g.font = `700 34px ${SANS}`;
+    g.fillStyle = 'rgba(255,255,255,.75)';
+    g.fillText('PROTEIN PER SCOOP', x + 6, 1110);
   }
-
-  g.fillStyle = ink;
-  g.letterSpacing = '4px';
-  g.font = `600 36px ${MONO}`;
-  g.fillText(protein ? 'PROTEIN PER SCOOP' : '', W / 2, 1060);
-  g.fillStyle = dark ? 'rgba(242,239,233,.55)' : 'rgba(10,10,11,.55)';
-  g.font = `600 30px ${MONO}`;
-  g.fillText('CLINICALLY TESTED · LAB VERIFIED', W / 2, 1260);
-  g.fillText(`NET WT. ${d.sizeLabel.toUpperCase()}`, W / 2, 1320);
+  g.fillStyle = '#0d0d0e';
+  g.fillRect(0, H - 170, W, 170);
+  g.fillStyle = d.band;
+  g.fillRect(x, H - 120, 70, 54);
+  g.fillStyle = '#e8e4dc';
+  g.font = `700 30px ${SANS}`;
+  g.fillText(`${d.flavourName.toUpperCase()} FLAVOUR`, x + 96, H - 80);
+  g.fillStyle = '#ffffff';
+  g.font = `800 32px ${SANS}`;
+  g.textAlign = 'right';
+  g.fillText(`Net Wt: ${d.sizeLabel}`, W - 60, H - 78);
   g.textAlign = 'left';
 }
 

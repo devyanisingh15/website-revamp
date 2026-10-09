@@ -49,6 +49,7 @@ const DEMO: Record<string, Record<string, PricePoint>> = {
   bcaa: { std: { price: 1100, mrp: 1400 } },
   'protein-bar': { std: { price: 600, mrp: 700 } },
   'peanut-butter': { std: { price: 400, mrp: 500 } },
+  'high-protein-oats': { '1kg': { price: 500, mrp: 600 } },
   'biozyme-sachets': { 'sachet-5x36': { price: 400, mrp: 450 } },
   'l-carnitine': { std: { price: 900, mrp: 1100 } },
   multivitamin: { std: { price: 500, mrp: 650 } },

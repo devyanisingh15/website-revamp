@@ -1,0 +1,6 @@
+<!-- Placeholder wordmark — replace with the official MuscleBlaze logo (same filename). -->
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 520 96" role="img" aria-label="MuscleBlaze">
+  <rect x="0" y="8" width="80" height="80" rx="10" fill="#e8202a"/>
+  <path d="M17 70V26h11l12 17 12-17h11v44H52V45L40 62 28 45v25z" fill="#fff"/>
+  <text x="100" y="66" font-family="Archivo, 'Helvetica Neue', Arial, sans-serif" font-weight="900" font-size="50" letter-spacing="-1" fill="#f2efe9">MUSCLE<tspan fill="#e8202a">BLAZE</tspan></text>
+</svg>
