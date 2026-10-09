@@ -246,7 +246,7 @@ export interface WrapLabelSpec {
  * Tub wrap label (aspect ≈ circumference : label height).
  * Layout: [back-left: directions + authenticity] [FRONT] [back-right: nutrition facts]
  */
-export function drawWrapLabel(spec: WrapLabelSpec, scale = 1, W = 4096, H = 1000) {
+export function drawWrapLabel(spec: WrapLabelSpec, scale = 1, W = 4096, H = 1000, withGrain = true) {
   const { c, g } = makeCanvas(W, H, scale);
   // Ground with brushed-metal print feel
   const ground = g.createLinearGradient(0, 0, 0, H);
@@ -447,7 +447,7 @@ export function drawWrapLabel(spec: WrapLabelSpec, scale = 1, W = 4096, H = 1000
   font(g, 600, 21, MONO);
   g.fillText('BATCH [B-XXXX]   MFD [date]   BEST BEFORE [date]   FSSAI LIC. [x]', dx, 830);
 
-  grain(g, 0, 0, W, H, 6);
+  if (withGrain) grain(g, 0, 0, W, H, 6);
   return c;
 }
 

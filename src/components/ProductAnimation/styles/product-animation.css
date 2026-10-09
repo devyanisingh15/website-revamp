@@ -1,0 +1,55 @@
+/* Product animation — pinned stage, overlays and fallbacks */
+.pa-section { position: relative; height: 900vh; background: #060607; margin-top: calc(-1 * var(--header-h)); }
+.pa-section--low { height: 700vh; }
+.pa-stage { position: sticky; top: 0; height: 100svh; overflow: hidden; }
+.pa-layer { position: absolute; inset: 0; transition: opacity .8s var(--ease-out-expo); }
+.pa-canvas { position: absolute !important; inset: 0; }
+.pa-poster { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; background: #060607; }
+
+.pa-overlay { position: absolute; z-index: 5; transition: none; will-change: opacity, transform; }
+.pa-center { inset: 0; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 1.25rem; pointer-events: none; }
+.pa-logo { width: min(56vw, 420px); height: auto; filter: drop-shadow(0 10px 40px rgba(0,0,0,.6)); }
+.pa-strap { font-family: var(--font-mono); font-size: 12px; letter-spacing: .24em; text-transform: uppercase; color: var(--color-bone-200); }
+
+.pa-copy { left: max(16px, 4vw); max-width: min(560px, calc(100vw - 32px)); }
+.pa-copy--reveal { top: calc(var(--header-h) + 8vh); }
+.pa-copy--caption { bottom: 9vh; isolation: isolate; text-shadow: 0 2px 18px rgba(0, 0, 0, .7); }
+.pa-copy--caption::before { content: ''; position: absolute; inset: -36px -48px -40px -40px; z-index: -1; background: radial-gradient(closest-side, rgba(6, 6, 7, .72), rgba(6, 6, 7, 0)); pointer-events: none; }
+.pa-copy--hero { top: calc(var(--header-h) + 14vh); }
+.pa-h1 { margin-top: .9rem; font-size: clamp(2.6rem, 1rem + 6vw, 6.5rem); line-height: .9; }
+.pa-h2 { margin-top: .6rem; font-size: clamp(2rem, 1rem + 3.4vw, 4.2rem); line-height: .95; }
+.pa-lede { margin-top: 1rem; max-width: 42ch; color: var(--color-bone-200); font-size: clamp(1rem, .9rem + .4vw, 1.25rem); line-height: 1.5; text-shadow: 0 2px 20px rgba(0,0,0,.6); }
+.pa-caption { margin-top: .5rem; font-weight: 700; font-size: clamp(1.25rem, 1rem + 1.2vw, 2rem); line-height: 1.15; letter-spacing: -.01em; text-shadow: 0 2px 24px rgba(0,0,0,.7); }
+.pa-caption--big { font-size: clamp(2rem, 1rem + 3.5vw, 4.5rem); font-weight: 820; text-transform: uppercase; font-variation-settings: 'wdth' 118; letter-spacing: -.03em; line-height: .92; }
+
+.pa-btn { display: inline-flex; align-items: center; gap: .5rem; height: 3.25rem; padding: 0 1.5rem; border-radius: 4px; font-weight: 600; border: 1px solid rgb(242 239 233 / .35); color: var(--color-bone-100); background: rgb(6 6 7 / .35); backdrop-filter: blur(6px); transition: background .2s, border-color .2s; }
+.pa-btn:hover { border-color: rgb(242 239 233 / .8); }
+.pa-btn--primary { background: var(--color-blaze-500); border-color: var(--color-blaze-500); color: #fff; }
+.pa-btn--primary:hover { background: var(--color-blaze-600); }
+
+.pa-rail { position: absolute; right: max(12px, 2vw); top: 50%; transform: translateY(-50%); z-index: 6; display: flex; flex-direction: column; gap: 10px; }
+.pa-rail__dot { position: relative; width: 10px; height: 10px; border-radius: 99px; background: rgb(242 239 233 / .25); transition: background .3s, transform .3s; }
+.pa-rail__dot.is-active { background: var(--color-blaze-500); transform: scale(1.3); }
+.pa-rail__label { position: absolute; right: 18px; top: 50%; transform: translateY(-50%); font-family: var(--font-mono); font-size: 10px; letter-spacing: .14em; text-transform: uppercase; color: var(--color-bone-400); white-space: nowrap; opacity: 0; transition: opacity .2s; }
+.pa-rail__dot:hover .pa-rail__label, .pa-rail__dot:focus-visible .pa-rail__label, .pa-rail__dot.is-active .pa-rail__label { opacity: 1; }
+
+.pa-skip { position: absolute; right: max(16px, 2vw); bottom: 24px; z-index: 6; display: inline-flex; align-items: center; gap: .4rem; font-family: var(--font-mono); font-size: 11px; letter-spacing: .14em; text-transform: uppercase; color: var(--color-bone-400); padding: 10px 12px; }
+.pa-skip:hover { color: var(--color-bone-100); }
+.pa-loading { position: absolute; left: 50%; bottom: 28px; transform: translateX(-50%); z-index: 6; font-family: var(--font-mono); font-size: 11px; letter-spacing: .2em; text-transform: uppercase; color: var(--color-bone-400); }
+.pa-hands { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; z-index: 4; pointer-events: none; }
+
+.pa-static { position: relative; min-height: calc(100svh - var(--header-h) - var(--announce-h)); display: grid; align-items: center; overflow: hidden; background: #060607; }
+.pa-static__copy { position: relative; z-index: 2; }
+
+@media (max-width: 767px) {
+  .pa-copy--caption { bottom: 13vh; }
+  .pa-copy--reveal, .pa-copy--hero { top: calc(var(--header-h) + 4vh); }
+  .pa-rail { display: none; }
+  .pa-lede { font-size: .98rem; }
+  /* Portrait: the product sits under the copy, so lay a soft scrim behind it */
+  .pa-copy--reveal, .pa-copy--hero { isolation: isolate; }
+  .pa-copy--reveal::before, .pa-copy--hero::before { content: ''; position: absolute; inset: -40px -24px -48px; z-index: -1; background: radial-gradient(120% 90% at 30% 45%, rgba(6, 6, 7, .82), rgba(6, 6, 7, 0) 75%); pointer-events: none; }
+  .pa-static { align-items: start; padding-top: 6vh; }
+  .pa-static .pa-poster { object-position: 70% 50%; }
+  .pa-static::after { content: ''; position: absolute; inset: 0; z-index: 1; background: linear-gradient(180deg, rgba(6, 6, 7, .9) 0%, rgba(6, 6, 7, .55) 45%, rgba(6, 6, 7, 0) 70%); }
+}

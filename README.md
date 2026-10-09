@@ -69,6 +69,57 @@ src/
 
 **Packshots.** `npm run packshots` renders every product (and each Biozyme flavour) from these models through the dev-only `packshot.html` page into `public/packshots/*.webp` (~35 KB each) and `src/data/packshots.json`. `ProductArt` uses them everywhere (cards, menus, cart, compare, fallbacks), with vector art only as a last resort. Re-run after changing artwork or models. `TubViewerScene` will load `product.model3d` (Draco GLB at `/draco/`) instead when the 3D team supplies one.
 
+## Product animation (home hero)
+
+A scroll-driven 3D commercial in `src/components/ProductAnimation/`. Scroll is the playhead: 900vh of scroll (700vh on mobile) is pinned to one sticky stage.
+
+| Progress | Beat |
+|---|---|
+| 0–10% | Brand intro: logo in the dark |
+| 10–25% | Product reveal: dolly in on the jar, label turns to camera |
+| 25–40% | Interaction: crane up, cap unscrews and is set down |
+| 40–55% | Macro powder: top-down macro, shallow depth of field, scoop digs in |
+| 55–70% | Scoop and pour: scoop lifts, tilts, granules fall into the shaker |
+| 70–82% | Shaker: water fills, cap screws on, shake, powder dissolves |
+| 82–95% | Hero: orbit, light sweep, macro push-in on the label |
+| 95–100% | Brand outro |
+
+```
+ProductAnimation/
+  ProductAnimation.tsx          section, scroll smoothing, captions, chapter rail, poster/static fallbacks
+  ProductAnimationCanvas.tsx    lazy chunk: Canvas, adaptive quality, all scenes
+  config/assets.ts              every file path + measured model dimensions (single place to swap assets)
+  config/timeline.ts            beat ranges and easing helpers
+  scenes/                       one file per beat (DOM overlays are three-free so they stay in the main bundle)
+  components/                   ProductModel, ShakerModel, PowderBed, PowderParticles, CinematicCamera, ProductLighting, Effects
+  styles/product-animation.css
+```
+
+**Asset findings (from inspecting the supplied GLBs):**
+- `protein_supplement_jar.glb`: separate body and cap meshes with usable UVs. The label is a fitted cylindrical sleeve sized from the measured body radius (`LABEL_SLEEVE`), so the artwork never stretches.
+- `shaker_bottle.glb`: separate `cup` / `cap` / `lid` nodes with 4K PBR textures. These are resized to 1024 (desktop) and 512 (mobile) WebP. The green cap is recoloured to brand black.
+- `protein_powder.glb`: no usable powder surface (its upper meshes are thread rings). Powder is procedural: a displaced granular bed with instanced granules, plus a deterministic ballistic particle stream that scrubs both ways with scroll.
+
+**Pipeline:**
+- Put the source GLBs in `assets-src/` as `protein-container.source.glb` and `shaker-bottle.source.glb`. These are gitignored.
+- `npm run assets` writes Draco-compressed desktop and mobile GLBs to `public/assets/` (about 120/70 KB and 320/130 KB) and the WebP label encodes.
+- `npm run label-assets` (with `npm run dev` running) redraws `product-label.png`, `cap-label.png` and `cap-top.png`.
+- To use official artwork, replace those PNGs with files of the same aspect ratio and run `npm run assets`.
+- The Draco decoder is self-hosted in `public/draco/`.
+
+**Swappable slots** (`config/assets.ts`):
+- `environment`: CC0 *studio_small_03* HDRI.
+- `logo`: placeholder wordmark.
+- `poster`: rendered from the hero frame. It is shown while the 3D loads and used for reduced motion and no-WebGL.
+- `fallbackVideo`: `null`. If set, it replaces the poster on low-end devices.
+- `handFootage`: `null`. No hand model was supplied. Drop transparent WebM/HEVC footage here and it scrubs in sync with the cap motion with no scene changes.
+
+**Quality tiers:**
+- Desktop: HDRI, ambient occlusion (N8AO), depth of field, film grain, 2600 granules.
+- Mobile / low-memory: simplified GLBs, half-resolution depth of field, Lightformer lighting, about 20% of the particles, calmer camera.
+- `PerformanceMonitor` steps down DPR, then effects, then falls back to the poster after sustained low fps. `?pa-nofallback` disables that final step for QA.
+- `prefers-reduced-motion` and no-WebGL get the static poster hero.
+
 ## Mock data and placeholders (all must be replaced)
 
 - **Prices:** `src/mocks/pricing.ts` holds round demo numbers so cart maths works. Every price shows a "Demo price" tag. Set `PRICE_MODE = 'placeholder'` to render `₹[price]` instead.
@@ -85,7 +136,7 @@ src/
 - **Goal routines:** a draft slot mapping, labelled "pending nutritionist review".
 
 ## Assets still required
-Print-ready dielines to replace the recreated pack artwork (the 3D labels are close recreations from photos, not the official files). Official logo SVG (the wordmark is a typographic placeholder), product photography, Draco GLB tub models under 2 MB (plus decoder files in `public/draco/`), label images per flavour, consented testimonial photos, Fit Hub imagery and an OG share image.
+Print-ready dielines to replace the recreated pack artwork (the 3D labels are close recreations from photos, not the official files). Official logo SVG (the wordmark is a typographic placeholder), product photography, label images per flavour, transparent hand footage for the animation's opening beat, consented testimonial photos, Fit Hub imagery and an OG share image.
 
 ## Backend integrations still required
 Product information and pricing, inventory, reviews, search, authenticity and lab reports, pincode/serviceability, cart/checkout plus payment gateway (UPI, cards, net banking, wallets, COD), orders/logistics tracking, identity/OTP, loyalty, newsletter ESP, support ticketing and CMS (Fit Hub, policies).

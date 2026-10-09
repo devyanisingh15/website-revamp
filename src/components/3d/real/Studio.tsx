@@ -49,7 +49,7 @@ export function RealStudio({
 }
 
 /** Polished stone disc whose edge fades out, so it sits on any page background. */
-function MarbleFloor({ dark, y, size }: { dark: boolean; y: number; size: number }) {
+export function MarbleFloor({ dark, y, size }: { dark: boolean; y: number; size: number }) {
   const map = useMemo(() => {
     const t = marbleTexture(dark).clone();
     t.repeat.set(1.6, 1.6);
