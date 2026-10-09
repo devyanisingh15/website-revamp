@@ -4,7 +4,7 @@ import { ShieldCheck, ShieldAlert, ShieldX, FileText, Hand, QrCode } from 'lucid
 import { verifyCode, lookupLabReport, DEMO_CODES, type VerifyResult, type LabReport } from '@/lib/api/authenticity';
 import { Field } from '../ui/Field';
 import { Button } from '../ui/Button';
-import { MockTag, Ph } from '../ui/Placeholder';
+import { MockTag } from '../ui/Placeholder';
 import { useReducedMotion } from '@/hooks/useMedia';
 import { cx } from '@/lib/format';
 
@@ -269,16 +269,16 @@ export function LabReportLookup({ tone = 'dark' }: { tone?: 'light' | 'dark' }) 
                 <h3 className="mt-1 text-lg font-bold">{state.report.product}</h3>
                 <p className="font-mono text-sm opacity-70">Batch {state.report.batch}</p>
               </div>
-              <MockTag>Placeholder report</MockTag>
+              <MockTag>Sample report</MockTag>
             </header>
             <dl className="mt-5 grid gap-x-8 gap-y-3 text-sm sm:grid-cols-2">
               <div className="flex justify-between gap-4 border-b border-current/10 pb-2">
                 <dt className="opacity-60">Testing lab</dt>
-                <dd>{state.report.lab ?? <Ph>[lab]</Ph>}</dd>
+                <dd className="text-right">{state.report.lab ?? '—'}</dd>
               </div>
               <div className="flex justify-between gap-4 border-b border-current/10 pb-2">
                 <dt className="opacity-60">Tested on</dt>
-                <dd>{state.report.testedOn ?? <Ph>[date]</Ph>}</dd>
+                <dd>{state.report.testedOn ?? '—'}</dd>
               </div>
               <div className="flex justify-between gap-4 border-b border-current/10 pb-2">
                 <dt className="opacity-60">Protein on label</dt>
@@ -286,16 +286,16 @@ export function LabReportLookup({ tone = 'dark' }: { tone?: 'light' | 'dark' }) 
               </div>
               <div className="flex justify-between gap-4 border-b border-current/10 pb-2">
                 <dt className="opacity-60">Protein tested</dt>
-                <dd className="font-mono">{state.report.proteinTested ?? <Ph>[x]</Ph>} g</dd>
+                <dd className="font-mono">{state.report.proteinTested != null ? `${state.report.proteinTested} g` : '—'}</dd>
               </div>
               {state.report.purityChecks.map((c) => (
                 <div key={c.name} className="flex justify-between gap-4 border-b border-current/10 pb-2">
                   <dt className="opacity-60">{c.name}</dt>
-                  <dd>{c.result ?? <Ph>[result]</Ph>}</dd>
+                  <dd>{c.result ?? '—'}</dd>
                 </div>
               ))}
             </dl>
-            <p className="mt-4 text-xs opacity-60">Report values appear here once the lab-report API is connected. PDF download: <Ph>[link]</Ph></p>
+            <p className="mt-4 text-xs opacity-60">Sample values for demo batch numbers. Live reports and PDF downloads come from the lab-report API once connected.</p>
           </article>
         )}
       </div>

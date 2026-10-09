@@ -63,7 +63,7 @@ export function NutritionBox({ product, flavourName, flavourColor, sizeLabel, se
       flavourName,
       sizeLabel,
       rows: labelRows(n),
-      servingSize: null,
+      servingSize: n.servingSize ?? null,
       servingsPerPack: servings,
       howTo: HOW_TO_STEPS,
       usageNote: SITE.usageNote,
@@ -141,19 +141,15 @@ export function NutritionBox({ product, flavourName, flavourColor, sizeLabel, se
                       {r.label}
                     </th>
                     <td className="py-2.5 text-right font-mono">
-                      {r.value != null ? (
-                        `${r.value} ${r.unit}`
-                      ) : (
-                        <span className="placeholder-token" title="To be confirmed against the current label">
-                          [x] {r.unit}
-                        </span>
-                      )}
+                      {r.value != null ? `${r.value} ${r.unit}` : '—'}
                     </td>
                   </tr>
                 ))}
               </tbody>
             </table>
-            <p className="mt-3 text-xs text-bone-400">[x] = not yet supplied. Confirm all figures against the live label before launch. Hover a row to find it on the pack.</p>
+            <p className="mt-3 text-xs text-bone-400">
+              {n.sourced ? 'Energy, protein, EAAs and BCAAs from public listings; other rows are mock values.' : 'Mock values for this concept build.'} Confirm all figures against the live label before launch. Hover a row to find it on the pack.
+            </p>
           </div>
         </div>
 

@@ -25,7 +25,6 @@ import { Price } from '@/components/ui/Price';
 import { Rating } from '@/components/ui/Rating';
 import { Button } from '@/components/ui/Button';
 import { Accordion } from '@/components/ui/Accordion';
-import { Ph } from '@/components/ui/Placeholder';
 import { cx } from '@/lib/format';
 import { hasWebGL } from '@/lib/webgl';
 import type { Product } from '@/data/types';
@@ -230,9 +229,14 @@ function NutritionPanel({ product, powder }: { product: Product; powder: string 
             </tbody>
           </table>
           <p className="mt-4 text-sm text-ink-600">
-            Full values by flavour: <Ph label="link to label image">[link to label image]</Ph>
+            Full values by flavour:{' '}
+            <a href="#label-title" className="font-semibold text-ink-950 underline underline-offset-4">
+              read the label ↓
+            </a>
           </p>
-          <p className="mt-2 text-xs text-ink-500">Figures from public listings; confirm against the current label before launch.</p>
+          <p className="mt-2 text-xs text-ink-500">
+            {n.sourced ? 'Figures from public listings; confirm against the current label before launch.' : 'Mock figures for this concept build; replace with the current label values before launch.'}
+          </p>
         </div>
       </div>
     </section>
@@ -284,6 +288,14 @@ export default function ProductPage() {
   const category = getCategory(product.category);
   const isBiozyme = BIOZYME_IDS.includes(product.id);
   const n = product.nutrition;
+  // Full protein macros → nutrition panel + label box. Sourced for Biozyme; MOCK for other SKUs.
+  const hasMacros = n.protein != null && n.eaas != null && n.bcaas != null && n.calories != null;
+  const specChips = hasMacros
+    ? [`${n.protein} g Protein`, `${n.eaas} g EAAs`, `${n.bcaas} g BCAAs`]
+    : n.protein != null
+    ? [`${n.protein} g Protein`, ...(n.calories != null ? [`${n.calories} kcal`] : [])]
+    : product.keySpecs ?? [];
+  const specPer = n.protein != null ? n.servingLabel ?? 'scoop' : null;
   const fbt = (product.frequentlyBoughtWith ?? []).map(getProduct).filter(Boolean) as Product[];
 
   const buy = (goToCheckout: boolean, from?: Element | null) =>
@@ -317,19 +329,15 @@ export default function ProductPage() {
           {product.oneLiner && <p className="mt-3 text-lede text-bone-300">{product.oneLiner}</p>}
           <Rating rating={product.rating} count={product.reviewCount} className="mt-4" />
 
-          {n.sourced ? (
-            <ul className="mt-6 flex flex-wrap gap-2" aria-label="Key specs per scoop">
-              {[`${n.protein} g Protein`, `${n.eaas} g EAAs`, `${n.bcaas} g BCAAs`].map((c) => (
+          {specChips.length > 0 && (
+            <ul className="mt-6 flex flex-wrap gap-2" aria-label={specPer ? `Key specs per ${specPer}` : 'Key specs'}>
+              {specChips.map((c) => (
                 <li key={c} className="rounded-sm border hairline px-3 py-2 font-mono text-sm">
                   {c}
                 </li>
               ))}
-              <li className="self-center pl-1 text-xs text-bone-400">per scoop</li>
+              {specPer && <li className="self-center pl-1 text-xs text-bone-400">per {specPer}</li>}
             </ul>
-          ) : (
-            <p className="mt-6 rounded-sm border border-dashed border-white/15 p-3 text-sm text-bone-400">
-              Nutrition figures for this SKU haven’t been supplied yet: <Ph>[protein]</Ph> · <Ph>[EAAs]</Ph> · <Ph>[BCAAs]</Ph> per scoop.
-            </p>
           )}
 
           <div className="mt-8 space-y-6 border-t hairline pt-8">
@@ -382,8 +390,8 @@ export default function ProductPage() {
       </section>
 
       {isBiozyme && <WhyBiozyme powder={flavourColor} />}
-      {n.sourced && <NutritionPanel product={product} powder={flavourColor} />}
-      {n.sourced && <NutritionBox product={product} flavourName={flavour?.name ?? ''} flavourColor={flavourColor} sizeLabel={size.label} servings={size.servings} />}
+      {hasMacros && <NutritionPanel product={product} powder={flavourColor} />}
+      {hasMacros && <NutritionBox product={product} flavourName={flavour?.name ?? ''} flavourColor={flavourColor} sizeLabel={size.label} servings={size.servings} />}
 
       {isBiozyme && (
         <section aria-labelledby="howto-title" className="border-t hairline py-20 md:py-28">
@@ -447,7 +455,7 @@ export default function ProductPage() {
         </section>
       )}
 
-      <ReviewsBlock product={product} flavourName={flavour?.family !== 'tbc' ? flavour?.name : undefined} />
+      <ReviewsBlock product={product} flavourId={product.flavours.length > 1 ? flavour?.id ?? null : null} flavourName={flavour?.family !== 'tbc' ? flavour?.name : undefined} />
 
       {/* Mobile sticky buy bar — product, price, CTA always in reach */}
       <div className="fixed inset-x-0 bottom-0 z-40 flex items-center gap-3 border-t hairline bg-ink-900/95 p-3 backdrop-blur lg:hidden">

@@ -11,13 +11,14 @@ export interface Goal {
   stack: string[];
   stackNote?: string;
   /**
-   * Which stack item fits each slot. DRAFT — the document asks for this strip
-   * but does not specify the mapping; it must be reviewed by the nutritionist.
+   * Which stack item fits each slot. MOCK — the document asks for this strip
+   * but does not specify the mapping; have the nutritionist review it before launch.
    */
   routine: Record<RoutineSlot, string | null>;
   /** Parameters for the low-poly figure: 0 = lean, 1 = big */
   figure: { mass: number; definition: number; tint: string };
-  bundleSavingPct: number | null;
+  /** MOCK — merchandising decision; replace with the real bundle offer */
+  bundleSavingPct: number;
   seo: { title: string; description: string };
   icon: 'dumbbell' | 'flame' | 'scale' | 'sprout' | 'leaf';
 }
@@ -31,7 +32,7 @@ export const GOALS: Goal[] = [
     stack: ['biozyme-performance-whey', 'creatine-monohydrate', 'pre-workout'],
     routine: { morning: 'creatine-monohydrate', 'pre-workout': 'pre-workout', 'post-workout': 'biozyme-performance-whey', night: null },
     figure: { mass: 0.85, definition: 0.8, tint: '#e8202a' },
-    bundleSavingPct: null,
+    bundleSavingPct: 12, // MOCK
     seo: {
       title: 'Best Supplements for Muscle Gain, MuscleBlaze',
       description: 'Build muscle with a lab-verified stack of whey, creatine and pre-workout chosen for Indian lifters.',
@@ -46,7 +47,7 @@ export const GOALS: Goal[] = [
     stack: ['biozyme-iso-zero', 'l-carnitine', 'protein-bar'],
     routine: { morning: 'l-carnitine', 'pre-workout': null, 'post-workout': 'biozyme-iso-zero', night: 'protein-bar' },
     figure: { mass: 0.25, definition: 0.95, tint: '#46e891' },
-    bundleSavingPct: null,
+    bundleSavingPct: 10, // MOCK
     seo: {
       title: 'Low-Carb Protein for Fat Loss, MuscleBlaze',
       description: 'Cut fat and keep muscle with low-carb isolate whey and lean-friendly supplements.',
@@ -61,7 +62,7 @@ export const GOALS: Goal[] = [
     stack: ['mass-gainer-xxl', 'peanut-butter', 'creatine-monohydrate'],
     routine: { morning: 'peanut-butter', 'pre-workout': null, 'post-workout': 'mass-gainer-xxl', night: 'creatine-monohydrate' },
     figure: { mass: 1, definition: 0.4, tint: '#ffb547' },
-    bundleSavingPct: null,
+    bundleSavingPct: 10, // MOCK
     seo: {
       title: 'Weight Gain Supplements, MuscleBlaze',
       description: 'Mass Gainer XXL, peanut butter and creatine: a simple stack for hard gainers.',
@@ -77,7 +78,7 @@ export const GOALS: Goal[] = [
     stackNote: 'Raw Whey or Biozyme Sachets (trial)',
     routine: { morning: 'multivitamin', 'pre-workout': null, 'post-workout': 'raw-whey', night: null },
     figure: { mass: 0.5, definition: 0.5, tint: '#f2efe9' },
-    bundleSavingPct: null,
+    bundleSavingPct: 8, // MOCK
     seo: {
       title: 'Beginner Protein Stack, MuscleBlaze',
       description: 'New to supplements? Start with one protein, one shaker and one habit.',
@@ -92,7 +93,7 @@ export const GOALS: Goal[] = [
     stack: ['plant-protein', 'bcaa', 'peanut-butter'],
     routine: { morning: 'peanut-butter', 'pre-workout': 'bcaa', 'post-workout': 'plant-protein', night: null },
     figure: { mass: 0.6, definition: 0.7, tint: '#9bb36a' },
-    bundleSavingPct: null,
+    bundleSavingPct: 10, // MOCK
     seo: {
       title: 'Plant Protein Stack, MuscleBlaze',
       description: 'Complete amino acid profile from plants for dairy-free days. Plant protein, BCAAs and peanut butter.',
@@ -108,11 +109,11 @@ export const ROUTINE_SLOTS: { id: RoutineSlot; label: string }[] = [
   { id: 'night', label: 'Night' },
 ];
 
-/** Expert note — name and credential to be supplied */
+/** Expert note — MOCK name and credential; replace with the real reviewing nutritionist */
 export const EXPERT = {
   note: 'Advice reviewed by a certified nutritionist',
-  name: null as string | null,
-  credential: null as string | null,
+  name: 'Ritika Sharma',
+  credential: 'M.Sc. Food & Nutrition, Registered Dietitian',
 };
 
 export const getGoal = (id: string) => GOALS.find((g) => g.id === id);

@@ -6,7 +6,6 @@ import { useSeo } from '@/hooks/useSeo';
 import { SEO } from '@/data/seo';
 import { ArticleCard, ArticleCover } from '@/components/blog/ArticleCard';
 import { ProductCard } from '@/components/product/ProductCard';
-import { Ph } from '@/components/ui/Placeholder';
 import { EXPERT } from '@/data/goals';
 import type { Product } from '@/data/types';
 import NotFoundPage from './NotFoundPage';
@@ -14,7 +13,7 @@ import NotFoundPage from './NotFoundPage';
 export default function ArticlePage() {
   const { slug } = useParams();
   const article = slug ? getArticle(slug) : undefined;
-  useSeo(article ? { title: article.title.slice(0, 59), description: `${article.title} — Fit Hub by MuscleBlaze.` } : { ...SEO.notFound, noindex: true });
+  useSeo(article ? { title: article.title.slice(0, 59), description: article.excerpt } : { ...SEO.notFound, noindex: true });
   if (!article) return <NotFoundPage />;
   const related = article.relatedProductIds.map(getProduct).filter(Boolean) as Product[];
   const more = ARTICLES.filter((a) => a.slug !== article.slug).slice(0, 3);
@@ -29,15 +28,9 @@ export default function ArticlePage() {
         </nav>
         <h1 className="display-tight mt-6 text-[clamp(2.2rem,1.4rem+3vw,4.2rem)] leading-[1.02]">{article.title}</h1>
         <p className="mt-6 flex flex-wrap gap-x-4 gap-y-1 font-mono text-xs uppercase tracking-wider text-bone-400">
-          <span>
-            By <Ph label="author">[Author]</Ph>
-          </span>
-          <span>
-            <Ph label="publish date">[date]</Ph>
-          </span>
-          <span>
-            <Ph label="read time">[x] min read</Ph>
-          </span>
+          <span>By {article.author}</span>
+          <time dateTime={article.publishedAt}>{new Date(article.publishedAt).toLocaleDateString('en-IN', { day: 'numeric', month: 'short', year: 'numeric' })}</time>
+          <span>{article.readMinutes} min read</span>
         </p>
       </header>
       <div className="container-x max-w-5xl">
@@ -46,12 +39,22 @@ export default function ArticlePage() {
         </div>
       </div>
       <div className="container-x max-w-3xl py-16">
-        <div className="rounded-md border border-dashed border-amber-signal/40 p-8">
-          <p className="eyebrow text-amber-signal">Content placeholder</p>
-          <p className="mt-3 text-lede text-bone-300">The article body for “{article.title}” will be supplied by the Fit Hub editorial team. This template renders long-form content, pull quotes and inline product cards.</p>
+        {/* MOCK body copy from src/data/blog.ts — replace with the Fit Hub CMS */}
+        <p className="text-lede text-bone-200">{article.excerpt}</p>
+        <div className="mt-10 space-y-10">
+          {article.body.map((block, i) => (
+            <section key={i}>
+              {block.heading && <h2 className="display-tight text-2xl md:text-3xl">{block.heading}</h2>}
+              {block.paragraphs.map((para, j) => (
+                <p key={j} className="mt-4 text-lg leading-relaxed text-bone-300">
+                  {para}
+                </p>
+              ))}
+            </section>
+          ))}
         </div>
-        <p className="mt-8 text-sm text-bone-400">
-          {EXPERT.note}: {EXPERT.name ?? <Ph>[Name]</Ph>}, {EXPERT.credential ?? <Ph>[Credential]</Ph>}
+        <p className="mt-12 border-t hairline pt-6 text-sm text-bone-400">
+          {EXPERT.note}: {EXPERT.name}, {EXPERT.credential}
         </p>
       </div>
       {related.length > 0 && (

@@ -10,7 +10,7 @@ import { FigureFallback } from '@/components/sections/FigureFallback';
 import { ProductCard } from '@/components/product/ProductCard';
 import { ProductArt } from '@/components/product/ProductArt';
 import { Button } from '@/components/ui/Button';
-import { Ph, MockTag } from '@/components/ui/Placeholder';
+import { MockTag } from '@/components/ui/Placeholder';
 import { useCart } from '@/lib/cart';
 import { useToast, TOAST_COPY } from '@/lib/toast';
 import { getPrice } from '@/mocks/pricing';
@@ -58,7 +58,7 @@ export default function GoalPage() {
             <p className="mt-6 max-w-[46ch] text-lede text-bone-300">{goal.intro}</p>
             <div className="mt-8 flex flex-wrap gap-3">
               <Button size="lg" onClick={addStack} icon={<ShoppingBag className="size-4" />}>
-                Get the Stack · Save {goal.bundleSavingPct != null ? `${goal.bundleSavingPct}` : <Ph label="bundle saving percentage">[x]</Ph>}%
+                Get the Stack · Save {goal.bundleSavingPct}%
               </Button>
               <a href="#stack" className="inline-flex h-14 items-center gap-2 px-2 font-semibold">
                 See the stack <ArrowRight className="size-4" aria-hidden />
@@ -97,7 +97,7 @@ export default function GoalPage() {
               <p className="flex items-center justify-end gap-2 text-sm text-ink-600">
                 Stack total {stackTotal > 0 && <MockTag className="border-amber-700/40 text-amber-800">Demo price</MockTag>}
               </p>
-              <p className="font-mono text-2xl font-semibold">{stackTotal > 0 ? formatINR(stackTotal) : '₹[price]'}</p>
+              <p className="font-mono text-2xl font-semibold">{stackTotal > 0 ? formatINR(stackTotal) : '—'}</p>
             </div>
           </div>
           <ol className="mt-12 grid gap-x-5 gap-y-12 sm:grid-cols-2 lg:grid-cols-3">
@@ -126,7 +126,7 @@ export default function GoalPage() {
             <h2 id="routine-title" className="display text-display-md">
               Your Day
             </h2>
-            <MockTag>Draft routine · pending nutritionist review</MockTag>
+            <MockTag>Sample routine</MockTag>
           </div>
           <ol className="mt-12 grid gap-px overflow-hidden rounded-md border hairline bg-white/10 md:grid-cols-4">
             {ROUTINE_SLOTS.map((slot) => {
@@ -165,7 +165,7 @@ export default function GoalPage() {
             <figcaption>
               <p className="font-semibold">{EXPERT.note}</p>
               <p className="mt-1 text-sm text-bone-400">
-                {EXPERT.name ?? <Ph label="nutritionist name">[Name]</Ph>}, {EXPERT.credential ?? <Ph label="nutritionist credential">[Credential]</Ph>}
+                {EXPERT.name}, {EXPERT.credential}
               </p>
             </figcaption>
           </figure>

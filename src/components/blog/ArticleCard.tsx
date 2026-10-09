@@ -1,10 +1,9 @@
 import { Link } from 'react-router-dom';
 import { ArrowUpRight } from 'lucide-react';
 import type { Article } from '@/data/blog';
-import { Ph } from '../ui/Placeholder';
 import { cx } from '@/lib/format';
 
-/** Generated editorial cover — placeholder until Fit Hub photography exists. */
+/** Generated editorial cover — stands in until Fit Hub photography exists. */
 export function ArticleCover({ motif, className }: { motif: Article['motif']; className?: string }) {
   const lines = Array.from({ length: 9 });
   return (
@@ -57,7 +56,7 @@ export function ArticleCard({ article, tone = 'dark', size = 'md' }: { article: 
       <div className="mt-4 flex items-center gap-3 font-mono text-[11px] uppercase tracking-wider opacity-70">
         <span className="text-blaze-500">{article.topic}</span>
         <span aria-hidden>·</span>
-        <span>{article.readMinutes ? `${article.readMinutes} min read` : <Ph label="read time">[x] min read</Ph>}</span>
+        <span>{article.readMinutes} min read</span>
       </div>
       <h3 className={cx('mt-2 font-bold leading-snug tracking-tight', size === 'lg' ? 'text-2xl md:text-3xl' : 'text-lg')}>
         <Link to={`/fit-hub/${article.slug}`} className="after:absolute after:inset-0">

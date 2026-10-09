@@ -2,7 +2,7 @@ import { Star } from 'lucide-react';
 import { Ph } from './Placeholder';
 import { cx } from '@/lib/format';
 
-/** "★ 4.x · [N] verified reviews" — renders placeholders until reviews API is connected */
+/** "★ 4.5 · 12,486 verified reviews" — values are MOCK (src/data/products.ts) until the reviews API is connected */
 export function Rating({ rating, count, compact, className }: { rating: number | null; count: number | null; compact?: boolean; className?: string }) {
   return (
     <div className={cx('flex items-center gap-1.5 text-sm', className)}>

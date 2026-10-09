@@ -6,7 +6,7 @@ import { wait } from './mock';
  *   MB-DEMO-0001  → verified genuine
  *   MB-DEMO-USED  → already verified [N] times
  *   anything else → not found
- * Batch numbers starting "B-DEMO" return a placeholder lab report.
+ * Batch numbers starting "B-DEMO" return a MOCK lab report.
  */
 export type VerifyResult =
   | { status: 'success' }
@@ -38,19 +38,19 @@ export async function lookupLabReport(batch: string): Promise<LabReport | null> 
   await wait(900);
   const b = batch.trim().toUpperCase();
   if (!b.startsWith('B-DEMO')) return null;
-  // Every field below is a placeholder until the lab-report API is connected.
+  // MOCK — every value below is sample data until the lab-report API is connected.
   return {
     batch: b,
     product: 'Biozyme Performance Whey Protein',
-    lab: null,
-    testedOn: null,
+    lab: 'NABL-accredited partner lab, Bengaluru',
+    testedOn: '14 Aug 2026',
     proteinLabel: 25,
-    proteinTested: null,
+    proteinTested: 25.4,
     purityChecks: [
-      { name: 'Protein content vs label', result: null },
-      { name: 'Heavy metals', result: null },
-      { name: 'Banned substances', result: null },
-      { name: 'Amino spiking', result: null },
+      { name: 'Protein content vs label', result: 'Pass (within ±5%)' },
+      { name: 'Heavy metals', result: 'Pass (below FSSAI limits)' },
+      { name: 'Banned substances', result: 'Not detected' },
+      { name: 'Amino spiking', result: 'Not detected' },
     ],
     reportUrl: null,
   };

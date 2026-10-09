@@ -72,12 +72,9 @@ function FilterPanel({ f, set, counts }: { f: FilterState; set: (n: FilterState)
 
       <fieldset className="space-y-3">
         <legend className="eyebrow mb-3 text-bone-400">More</legend>
-        <label className="flex min-h-10 cursor-pointer items-center justify-between gap-3 text-sm opacity-50" title="Available when reviews data is connected">
-          <span>
-            Rating 4★ and above
-            <span className="block text-xs text-bone-400">Needs reviews data</span>
-          </span>
-          <input type="checkbox" className="size-5 accent-blaze-500" checked={f.rating4} disabled onChange={() => set({ ...f, rating4: !f.rating4 })} />
+        <label className="flex min-h-10 cursor-pointer items-center justify-between gap-3 text-sm">
+          Rating 4★ and above
+          <input type="checkbox" className="size-5 accent-blaze-500" checked={f.rating4} onChange={() => set({ ...f, rating4: !f.rating4 })} />
         </label>
         <label className="flex min-h-10 cursor-pointer items-center justify-between gap-3 text-sm">
           In stock only

@@ -70,18 +70,23 @@ export async function findOrder(id: string): Promise<Order | null> {
   const clean = id.trim().toUpperCase().replace(/^#/, '');
   const found = listOrders().find((o) => o.id === clean);
   if (found) return found;
-  // Demo order for showing a mid-journey tracking state
+  // MOCK — demo order for showing a mid-journey tracking state
   if (clean === 'MBDEMO123') {
+    const placed = new Date();
+    placed.setDate(placed.getDate() - 2);
     const eta = new Date();
     eta.setDate(eta.getDate() + 1);
     return {
       id: 'MBDEMO123',
-      createdAt: new Date().toISOString(),
+      createdAt: placed.toISOString(),
       eta: eta.toISOString(),
       status: 'shipped',
-      lines: [],
-      total: 0,
-      address: { name: '', phone: '', pincode: '', line1: '', line2: '', city: '', state: '' },
+      lines: [
+        { key: 'biozyme-performance-whey|rich-milk-chocolate|1kg', productId: 'biozyme-performance-whey', flavourId: 'rich-milk-chocolate', sizeId: '1kg', qty: 1 },
+        { key: 'creatine-monohydrate|unflavoured|250g', productId: 'creatine-monohydrate', flavourId: 'unflavoured', sizeId: '250g', qty: 1 },
+      ],
+      total: 3198,
+      address: { name: 'Rohan Verma', phone: '9876501234', pincode: '411045', line1: 'Flat 12B, Sai Residency', line2: 'Baner Road', city: 'Pune', state: 'Maharashtra' },
       payment: 'upi',
     };
   }
