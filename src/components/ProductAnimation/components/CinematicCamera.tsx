@@ -23,6 +23,10 @@ interface Shot {
   focus: V3;
   bokeh: number;
   note: string;
+  /** Portrait screens: where the look-target sits horizontally (default 0 = centred on the subject) */
+  px?: number;
+  /** Portrait screens: extra pull-back for this shot (default 1), for wide action like two hands */
+  pz?: number;
 }
 
 export const SHOTS: Shot[] = [
@@ -30,9 +34,9 @@ export const SHOTS: Shot[] = [
   { p: 0.1, pos: [0.3, 0.5, 3.1], target: [-0.32, 0.4, 0], fov: 28, focus: [0, 0.4, 0.2], bokeh: 1.2, note: 'Reveal — wide' },
   { p: 0.18, pos: [0.12, 0.46, 2.3], target: [-0.3, 0.38, 0], fov: 27, focus: [0, 0.38, 0.25], bokeh: 1.8, note: 'Slow dolly in' },
   { p: 0.25, pos: [-0.02, 0.42, 1.75], target: [-0.26, 0.37, 0], fov: 26, focus: [0, 0.36, 0.25], bokeh: 2.2, note: 'Label reveal' },
-  { p: 0.28, pos: [0.22, 1.12, 2.65], target: [-0.34, 0.5, 0], fov: 26, focus: [0, 0.66, 0.22], bokeh: 2.0, note: 'Hands — opening, slightly above like the reference photo' },
-  { p: 0.335, pos: [0.1, 1.08, 2.25], target: [-0.3, 0.55, 0], fov: 26, focus: [0, 0.72, 0.2], bokeh: 2.2, note: 'Hands — slow push-in while the cap twists off' },
-  { p: 0.39, pos: [0.0, 1.25, 1.75], target: [-0.22, 0.62, 0], fov: 25, focus: [-0.1, 0.7, 0.05], bokeh: 2.4, note: 'Cap carried to the counter' },
+  { p: 0.28, pos: [0.24, 1.32, 2.9], target: [-0.36, 0.66, 0], fov: 26, focus: [0, 0.66, 0.22], bokeh: 2.0, note: 'Hands — opening, slightly above like the reference photo; whole upper hand in frame below the header', px: 0.08, pz: 1.32 },
+  { p: 0.335, pos: [0.12, 1.3, 2.5], target: [-0.32, 0.7, 0], fov: 26, focus: [0, 0.72, 0.2], bokeh: 2.2, note: 'Hands — slow push-in while the cap twists off', px: 0.08, pz: 1.32 },
+  { p: 0.39, pos: [0.0, 1.38, 2.0], target: [-0.24, 0.74, 0], fov: 25, focus: [-0.1, 0.7, 0.05], bokeh: 2.4, note: 'Cap carried to the counter', px: -0.4, pz: 1.3 },
   { p: 0.45, pos: [0.03, 1.08, 0.24], target: [0.02, 0.69, 0.0], fov: 22, focus: [0.035, 0.695, 0.02], bokeh: 5, note: 'Macro powder' },
   { p: 0.52, pos: [0.16, 1.0, 0.34], target: [0.03, 0.71, 0.02], fov: 23, focus: [0.035, 0.72, 0.02], bokeh: 4.5, note: 'Macro — scoop dips' },
   { p: 0.58, pos: [0.3, 1.18, 0.95], target: [0.22, 0.86, 0.04], fov: 25, focus: [0.2, 0.9, 0.04], bokeh: 3.2, note: 'Follow scoop out' },
@@ -86,12 +90,15 @@ export function CinematicCamera() {
     const aspect = size.width / size.height;
     // Portrait: desktop shots leave room for copy beside the product; on phones the
     // copy sits above/below, so slide the whole shot back toward the subject.
+    // Shots can set px: during the hands beat the jar sits left of centre so the hand
+    // reaching in from the right stays on screen, then the frame follows the cap left.
     if (aspect < 1) {
-      const recentre = -tmp.tgt.x * 0.7 * (1 - aspect);
+      const px = THREE.MathUtils.lerp(a.px ?? 0, b.px ?? 0, e);
+      const recentre = (px - tmp.tgt.x) * Math.min(1, (1 - aspect) * 1.6);
       tmp.pos.x += recentre;
       tmp.tgt.x += recentre;
     }
-    const pullBack = aspect < 1 ? 1 + (1 - aspect) * 0.85 : 1;
+    const pullBack = aspect < 1 ? (1 + (1 - aspect) * 0.85) * THREE.MathUtils.lerp(a.pz ?? 1, b.pz ?? 1, e) : 1;
     const calm = quality === 'low' ? 0.72 : 1;
     tmp.pos.sub(tmp.tgt);
     tmp.pos.x *= calm;
