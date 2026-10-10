@@ -98,7 +98,7 @@ for (const [src, out, width, quality] of [
   ['powder-albedo.png', 'powder-albedo.webp', 512, 86],
   ['powder-height.png', 'powder-height.webp', 512, 90],
   ['hand-top.png', 'hand-top.webp', 716, 88],
-  ['hand-bottom.png', 'hand-bottom.webp', 821, 88],
+  ['hand-bottom.png', 'hand-bottom.webp', 1457, 88],
 ]) {
   await sharp(IMG(src)).resize({ width }).webp({ quality, alphaQuality: 90 }).toFile(IMG(out));
   console.log(`${out.padEnd(34)} ${kb(new URL(out, OUT))}`);
