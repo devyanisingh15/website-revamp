@@ -16,9 +16,10 @@
 .pa-copy--caption { bottom: 9vh; isolation: isolate; text-shadow: 0 2px 18px rgba(0, 0, 0, .7); }
 .pa-copy--caption::before { content: ''; position: absolute; inset: -36px -48px -40px -40px; z-index: -1; background: radial-gradient(closest-side, rgba(6, 6, 7, .72), rgba(6, 6, 7, 0)); pointer-events: none; }
 .pa-copy--hero { top: calc(var(--header-h) + 14vh); }
-.pa-h1 { margin-top: .9rem; font-size: clamp(2.6rem, 1rem + 6vw, 6.5rem); line-height: .9; }
+/* hero headline + subcopy sized down ~15% (from claude/sharp-mayer-9fdb73, ported from the old Hero) */
+.pa-h1 { margin-top: .9rem; font-size: clamp(2.2rem, .85rem + 5.1vw, 5.5rem); line-height: .9; }
 .pa-h2 { margin-top: .6rem; font-size: clamp(2rem, 1rem + 3.4vw, 4.2rem); line-height: .95; }
-.pa-lede { margin-top: 1rem; max-width: 42ch; color: var(--color-bone-200); font-size: clamp(1rem, .9rem + .4vw, 1.25rem); line-height: 1.5; text-shadow: 0 2px 20px rgba(0,0,0,.6); }
+.pa-lede { margin-top: 1rem; max-width: 42ch; color: var(--color-bone-200); font-size: clamp(.95rem, .86rem + .35vw, 1.12rem); line-height: 1.5; text-shadow: 0 2px 20px rgba(0,0,0,.6); }
 .pa-caption { margin-top: .5rem; font-weight: 700; font-size: clamp(1.25rem, 1rem + 1.2vw, 2rem); line-height: 1.15; letter-spacing: -.01em; text-shadow: 0 2px 24px rgba(0,0,0,.7); }
 .pa-caption--big { font-size: clamp(2rem, 1rem + 3.5vw, 4.5rem); font-weight: 820; text-transform: uppercase; font-variation-settings: 'wdth' 118; letter-spacing: -.03em; line-height: .92; }
 
@@ -45,7 +46,7 @@
   .pa-copy--caption { bottom: 13vh; }
   .pa-copy--reveal, .pa-copy--hero { top: calc(var(--header-h) + 4vh); }
   .pa-rail { display: none; }
-  .pa-lede { font-size: .98rem; }
+  .pa-lede { font-size: .92rem; }
   /* Portrait: the product sits under the copy, so lay a soft scrim behind it */
   .pa-copy--reveal, .pa-copy--hero { isolation: isolate; }
   .pa-copy--reveal::before, .pa-copy--hero::before { content: ''; position: absolute; inset: -40px -24px -48px; z-index: -1; background: radial-gradient(120% 90% at 30% 45%, rgba(6, 6, 7, .82), rgba(6, 6, 7, 0) 75%); pointer-events: none; }
