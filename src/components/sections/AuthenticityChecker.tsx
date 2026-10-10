@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState, type FormEvent } from 'react';
+import { useEffect, useRef, useState, type FormEvent, type ReactNode } from 'react';
 import { Link } from 'react-router-dom';
 import { ShieldCheck, ShieldAlert, ShieldX, FileText, Hand, QrCode } from 'lucide-react';
 import { verifyCode, lookupLabReport, DEMO_CODES, type VerifyResult, type LabReport } from '@/lib/api/authenticity';
@@ -126,7 +126,7 @@ function Seal({ tone }: { tone: 'ok' | 'warn' | 'bad' }) {
 /* ------------------------------------------------------------------
    Verify form + result states
    ------------------------------------------------------------------ */
-export function VerifyForm({ tone = 'light', withSticker = true }: { tone?: 'light' | 'dark'; withSticker?: boolean }) {
+export function VerifyForm({ tone = 'light', withSticker = true, afterForm }: { tone?: 'light' | 'dark'; withSticker?: boolean; /** Rendered directly under the Verify Now button row */ afterForm?: ReactNode }) {
   const [code, setCode] = useState('');
   const [batch, setBatch] = useState('');
   const [error, setError] = useState<string | null>(null);
@@ -181,6 +181,8 @@ export function VerifyForm({ tone = 'light', withSticker = true }: { tone?: 'lig
           Try <code className="font-mono">{DEMO_CODES.success}</code> (genuine), <code className="font-mono">{DEMO_CODES.used}</code> (already used) or any other code (not found).
         </p>
       </form>
+
+      {afterForm}
 
       <div ref={resultRef} tabIndex={-1} aria-live="polite" className="outline-none">
         {result?.status === 'success' && (
