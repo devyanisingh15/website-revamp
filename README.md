@@ -1,7 +1,7 @@
 # MuscleBlaze Redesign — Concept Build
 
 A premium, interactive ecommerce redesign concept for MuscleBlaze built around one idea: **Proof in Every Scoop.**
-Content comes from *MuscleBlaze Redesign — Website Content*. Every number, lab or claim on the site is taken from that document. Missing data is shown as a visible placeholder like `[price]`, `[N]` or `[x]`, never guessed.
+Content comes from *MuscleBlaze Redesign — Website Content*. Where the document has no data, the site is filled with **plausible mock values** (prices, ratings, reviews, nutrition for most SKUs, contact details, article copy and so on) so the concept looks complete. Every mock value is marked `MOCK` in the source and listed below so it can be swapped for real data.
 
 > **This is not production-ready.** Pricing, reviews, authenticity, delivery, payments, orders, auth and loyalty are all mocked (see below).
 
@@ -24,9 +24,10 @@ Demo inputs:
 | Flow | Input | Result |
 |---|---|---|
 | Authenticity | `MB-DEMO-0001` / `MB-DEMO-USED` / anything else | Genuine / already verified 3× / not found |
-| Lab report | `B-DEMO-01` | Placeholder report |
+| Lab report | `B-DEMO-01` | Sample (mock) lab report |
 | Pincode | `999999` | Not serviceable |
 | Coupon | `DEMO10` | 10% off |
+| Track order | `MBDEMO123` | Sample order, shipped |
 | Checkout UPI | `fail@upi` | Payment failed state |
 | Track order | `MBDEMO123` or any order placed in this browser | Timeline |
 
@@ -61,7 +62,7 @@ src/
 
 **Realistic packaging (`components/3d/real/`).** Every pack is modelled from the reference photos rather than primitives:
 - `models.tsx`: lathe-turned tub/jar with rounded shoulders, threaded neck, knurled screw cap with an embossed MB top, shrink-sleeve wrap label; stand-up pouch (pillowed panels, gusset); sachet; supplement bottle; flow-wrapped bar; matte shaker with flip cap; flat-bottomed scoop with a heaped powder mound; powder surface.
-- `labelArt.ts`: canvas recreations of the pack artwork. The Biozyme wrap follows the 2 kg tub (charcoal panel, MB monogram with yellow B, molecule diagonal, clinically-tested badge, certification column, flavour/net-weight strip) with directions, authenticity sticker and a nutrition facts panel on the back. The pouch follows the MB FiT High Protein Oats pack. Only claims from the content document are printed; unknown values print as `[x]`.
+- `labelArt.ts`: canvas recreations of the pack artwork. The Biozyme wrap follows the 2 kg tub (charcoal panel, MB monogram with yellow B, molecule diagonal, clinically-tested badge, certification column, flavour/net-weight strip) with directions, authenticity sticker and a nutrition facts panel on the back. The pouch follows the MB FiT High Protein Oats pack. Only claims from the content document are printed; values the 3D code cannot get from the data still print as `[x]` (see Mock data below).
 - `Studio.tsx`: photographic lighting modelled on the reference reel (warm window softbox, cool rim, bounce), a polished marble counter (dark or light) that fades into the page, and contact shadows. No HDRI download.
 - `spec.ts`: maps each catalogue product (+ flavour + size) to a pack type, proportions and artwork.
 
@@ -137,20 +138,37 @@ ProductAnimation/
 - **Mobile layout:** the stage sits between the heading and the flavour list, so a tap visibly changes the scene.
 - **New or changed flavour:** add `<flavour-id>.webp` (transparent background, about 1536×1024) to `assets-src/reference/flavours/`, using an id from `src/data/flavours.ts`, then run `npm run flavour-assets`.
 
-## Mock data and placeholders (all must be replaced)
+## Mock data (all must be replaced)
 
-- **Prices:** `src/mocks/pricing.ts` holds round demo numbers so cart maths works. Every price shows a "Demo price" tag. Set `PRICE_MODE = 'placeholder'` to render `₹[price]` instead.
-- **Ratings and reviews:** all `null`, rendered as `★ 4.x · [N] verified reviews`. The 4★ filter is disabled. The reviews list shows the empty state.
-- **Testimonials:** three clearly labelled placeholder slots. No reviews have been invented.
-- **Product data:** only Biozyme Performance (and its sachets) carry figures from the document (25 g protein, 11.75 g EAAs, 5.51 g BCAAs, ~120 kcal). Other SKUs show `[x]`, and their flavour lists say "Flavours to be confirmed". Pack sizes for non-whey SKUs are TBC. All figures must be checked against the live label.
-- **Badges, recommended and bestselling order, stock:** `src/mocks/merchandising.ts`. Only Iso Zero → Low Carb is grounded in the document. Mango is marked sold out to demo that path.
-- **Authenticity and lab-report API:** `lib/api/authenticity.ts`. QR scanning isn't implemented.
-- **Payments and orders:** `lib/api/orders.ts`. No gateway is connected and no money is taken. Orders live in localStorage.
-- **Delivery/pincode:** `lib/api/delivery.ts` returns a date 3 days out.
-- **Auth:** the OTP login is a local flag only.
-- **Loyalty:** the name `HK Cash` is configurable in `data/site.ts` and flagged "name to confirm". The balance is `[x]`.
-- **Missing values:** FSSAI licence no., support email and phone, nutritionist name and credential, timeline years, bundle saving %, article bodies, authors and dates, and policy/careers/press copy.
-- **Goal routines:** a draft slot mapping, labelled "pending nutritionist review".
+Everything below is **mock data** chosen to be plausible for an Indian sports-nutrition brand. It is not real and must be replaced before launch. Search the code for `MOCK` to find each block.
+
+**Sourced from the content document — do not change without a new source:** product names and categories; Biozyme Performance (and its sachets) at 25 g protein, 11.75 g EAAs, 5.51 g BCAAs and ~120 kcal per scoop; "50% higher protein absorption"; the five Biozyme flavour names; High Protein Oats at 22 g protein per 100 g; the 2021 NutraIngredients award; the ₹999 free-delivery threshold.
+
+| What | Where | Notes |
+|---|---|---|
+| Prices and MRPs | `src/mocks/pricing.ts` | Realistic INR selling price + MRP per pack size. `PRICE_MODE = 'demo'` shows them (each tagged "Demo price"); `'placeholder'` renders `₹[price]` tokens instead. |
+| Nutrition for other SKUs, plus carbs/sugars/fat/sodium/serving size for Biozyme | `src/data/products.ts` (`nutrition`, `keySpecs`) | `nutrition.sourced` is `true` only for the Biozyme figures above. Non-protein products (creatine, pre-workout, capsules) show `keySpecs` chips instead. |
+| Flavour ranges for non-Biozyme SKUs | `src/data/flavours.ts` (`MOCK_FLAVOURS`) | |
+| Pack sizes and servings per pack | `src/data/products.ts` (`sizes`) | |
+| One-liners / "Who it's for" not in the document | `src/data/products.ts` | Marked `// MOCK` inline. |
+| Ratings and review counts | `src/data/products.ts` (`rating`, `reviewCount`) | 4.2–4.5 with hundreds to thousands of reviews. The 4★ shop filter now works. |
+| Reviews and the star breakdown | `src/mocks/reviews.ts` | 3–6 sample reviews per main product, generic ones for the rest. The flavour, tag and photo filters work on these. Tagged "Sample reviews". |
+| Testimonials | `src/data/testimonials.ts` | Three sample customers, tagged "Sample". Replace with real, consented reviews. |
+| Badges, recommended/bestselling order, stock | `src/mocks/merchandising.ts` | Only Iso Zero → Low Carb is grounded in the document. Mango is marked sold out to demo that path. |
+| FSSAI licence no., support email/phone/hours, loyalty balance | `src/data/site.ts` | The FSSAI number is invented. Loyalty name `HK Cash` is treated as confirmed. |
+| Nutritionist name and credential, bundle saving %, goal routines | `src/data/goals.ts` | Routine is tagged "Sample routine". It needs nutritionist review. |
+| About timeline years (other than 2021) | `src/pages/AboutPage.tsx` | |
+| Fit Hub excerpts, authors, dates, read times and article bodies | `src/data/blog.ts` | Needs editorial and nutritionist review. |
+| Privacy, terms, returns, careers and press copy | `src/data/pages.ts` | Sample copy, **not legal text**. Tagged "Sample copy". |
+| Lab report values for `B-DEMO` batches | `src/lib/api/authenticity.ts` | Tagged "Sample report". |
+| Demo tracking order `MBDEMO123` | `src/lib/api/orders.ts` | |
+| Carton batch/MFD/best-before line | `src/components/product/box/boxPanels.ts` (`MOCK_BATCH`) | |
+
+**Mocked services:** authenticity/lab report (`lib/api/authenticity.ts`, no QR scanning), payments and orders (`lib/api/orders.ts`, no gateway, orders in localStorage), delivery/pincode (`lib/api/delivery.ts`, always 3 days out), coupons, newsletter, and OTP login (a local flag only).
+
+**Still showing placeholders:** the 3D pack labels (`src/components/3d/real/`) were left alone in this pass. They still print nutrition only for sourced SKUs, `Servings: [x]`, and "Flavour TBC" on the protein bar wrapper.
+
+The `Ph` placeholder component and `PRICE_MODE = 'placeholder'` are still available if you need to switch back to visible tokens.
 
 ## Assets still required
 Print-ready dielines to replace the recreated pack artwork (the 3D labels are close recreations from photos, not the official files). Official logo SVG (the wordmark is a typographic placeholder), product photography, label images per flavour, transparent hand footage for the animation's opening beat, consented testimonial photos, Fit Hub imagery and an OG share image.
@@ -159,10 +177,11 @@ Print-ready dielines to replace the recreated pack artwork (the 3D labels are cl
 Product information and pricing, inventory, reviews, search, authenticity and lab reports, pincode/serviceability, cart/checkout plus payment gateway (UPI, cards, net banking, wallets, COD), orders/logistics tracking, identity/OTP, loyalty, newsletter ESP, support ticketing and CMS (Fit Hub, policies).
 
 ## SEO
-Per-route title, description, canonical, OG and robots through `useSeo`. Doc-supplied metadata is used verbatim where given (`data/seo.ts`). `public/sitemap.xml` is generated from the data (`npm run sitemap`), and there is a `robots.txt`. Product JSON-LD includes only known facts, with no price or rating. **Note:** this is a client-rendered SPA, so add prerendering or SSR at deploy time for crawlers that don't run JS.
+Per-route title, description, canonical, OG and robots through `useSeo`. Doc-supplied metadata is used verbatim where given (`data/seo.ts`). `public/sitemap.xml` is generated from the data (`npm run sitemap`), and there is a `robots.txt`. Product JSON-LD includes only known facts. Mock prices and ratings are deliberately left out so fake data is not published to search engines. **Note:** this is a client-rendered SPA, so add prerendering or SSR at deploy time for crawlers that don't run JS.
 
 ## Assumptions
 - Home section order follows the document's seven beats (product → science → proof → range → goal → people → offer), so Authenticity comes right after the Biozyme story.
 - Quiz rules use reasons stated in the document. "Vegetarian-friendly" maps to Plant Protein; the nutrition team should confirm this.
 - A few structural headings ("Verify Your Tub", "The Road So Far", "What We Stand For", "Your Day", "Keep Reading") and the Wellness/Accessories category intros were written for layout. They make no claims and should be reviewed by the brand team.
+- Mock values (see above) are plausible for MuscleBlaze in India: whey at roughly ₹1,800–3,300 per kg, 33–36 g scoops with 24–27 g protein, 3 g creatine per serve, ratings of 4.2–4.5, and dates in 2025–2026. Claims stay modest, with no medical or clinical claims beyond the document.
 - Delivery fee is not specified, so the cart shows "Free" above ₹999 and "Calculated at checkout" below.

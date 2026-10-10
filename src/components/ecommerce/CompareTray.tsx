@@ -6,7 +6,7 @@ import { getPrice } from '@/mocks/pricing';
 import { formatINR } from '@/lib/format';
 import { ProductArt } from '../product/ProductArt';
 import { Dialog } from '../ui/Dialog';
-import { Ph, MockTag } from '../ui/Placeholder';
+import { MockTag } from '../ui/Placeholder';
 import { Button } from '../ui/Button';
 import { useAddToCart } from '@/hooks/useAddToCart';
 import type { Product } from '@/data/types';
@@ -69,20 +69,19 @@ function perServing(p: Product) {
 
 function CompareTable({ products }: { products: Product[] }) {
   const addToCart = useAddToCart();
-  const g = (v: number | null, unit: string) => (v == null ? <Ph>[x]</Ph> : `${v} ${unit}`);
+  const na = <span className="text-bone-500" title="Not applicable">—</span>;
+  const g = (v: number | null, unit: string) => (v == null ? na : `${v} ${unit}`);
   const rows: { label: string; render: (p: Product) => React.ReactNode }[] = [
     { label: 'Protein', render: (p) => g(p.nutrition.protein, 'g') },
     { label: 'Carbs', render: (p) => g(p.nutrition.carbs, 'g') },
     { label: 'BCAAs', render: (p) => g(p.nutrition.bcaas, 'g') },
-    { label: 'Calories', render: (p) => (p.nutrition.calories == null ? <Ph>[x]</Ph> : `~${p.nutrition.calories} kcal`) },
+    { label: 'Calories', render: (p) => (p.nutrition.calories == null ? na : `~${p.nutrition.calories} kcal`) },
     {
       label: 'Price per serving',
       render: (p) => {
         const v = perServing(p);
         return v == null ? (
-          <>
-            ₹<Ph>[y]</Ph>
-          </>
+          na
         ) : (
           <span className="inline-flex items-center gap-2">
             {formatINR(v)} <MockTag />
@@ -147,7 +146,7 @@ function CompareTable({ products }: { products: Product[] }) {
           </tr>
         </tbody>
       </table>
-      <p className="mt-6 text-xs text-bone-400">Values marked [x] are not yet supplied. Figures should be checked against the live label before launch.</p>
+      <p className="mt-6 text-xs text-bone-400">— = not applicable. Figures other than Biozyme Performance’s protein, EAAs, BCAAs and calories are mock values; check against the live label before launch.</p>
     </div>
   );
 }

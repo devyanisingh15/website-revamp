@@ -5,7 +5,7 @@ import { SITE } from '@/data/site';
 import { useSeo } from '@/hooks/useSeo';
 import { Field } from '@/components/ui/Field';
 import { Button } from '@/components/ui/Button';
-import { MockTag, Ph } from '@/components/ui/Placeholder';
+import { MockTag } from '@/components/ui/Placeholder';
 import { isValidEmail } from '@/lib/api/newsletter';
 import { wait } from '@/lib/api/mock';
 
@@ -36,12 +36,17 @@ export default function ContactPage() {
           <h1 className="display mt-4 text-display-lg">Contact</h1>
           <ul className="mt-10 space-y-4">
             <li className="flex items-center gap-3">
-              <Mail className="size-5 text-blaze-400" aria-hidden /> {SITE.supportEmail ?? <Ph label="support email">[support email]</Ph>}
+              <Mail className="size-5 text-blaze-400" aria-hidden /> <a href={`mailto:${SITE.supportEmail}`} className="hover:underline">
+                {SITE.supportEmail}
+              </a>
             </li>
             <li className="flex items-center gap-3">
-              <Phone className="size-5 text-blaze-400" aria-hidden /> {SITE.supportPhone ?? <Ph label="support phone">[support phone]</Ph>}
+              <Phone className="size-5 text-blaze-400" aria-hidden /> <a href={`tel:${SITE.supportPhone.replace(/\s/g, '')}`} className="hover:underline">
+                {SITE.supportPhone}
+              </a>
             </li>
           </ul>
+          <p className="mt-4 text-sm text-bone-400">{SITE.supportHours}</p>
           <p className="mt-10 text-sm text-bone-400">If your authenticity check failed, include the code and batch number so we can investigate.</p>
         </div>
         <div className="lg:col-span-6 lg:col-start-7">

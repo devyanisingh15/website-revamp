@@ -8,6 +8,10 @@
  * Replace with the print dielines when the brand team supplies them.
  */
 import { labelRows, type LabelRow } from '@/components/product/box/boxPanels';
+import { SITE } from '@/data/site';
+
+// MOCK batch/date line for the concept build
+const BATCH_LINE = `BATCH B-2611   MFD 09/2026   BEST BEFORE 08/2028   FSSAI LIC. ${SITE.fssaiLicence}`;
 
 const SANS = '"Archivo Variable", Archivo, "Helvetica Neue", Arial, sans-serif';
 const MONO = '"JetBrains Mono", ui-monospace, monospace';
@@ -194,7 +198,7 @@ function nutritionPanel(g: G, x: number, y: number, w: number, rows: LabelRow[],
   g.fillRect(l, yy, r - l, 3);
   yy += 38;
   font(g, 500, 24, SANS);
-  g.fillText(`Serving: 1 scoop · Servings: ${servings ?? '[x]'}`, l, yy);
+  g.fillText(servings ? `Serving: 1 scoop · Servings: ${servings}` : 'Serving: 1 scoop', l, yy);
   yy += 14;
   g.fillRect(l, yy, r - l, 10);
   rows.forEach((row) => {
@@ -207,7 +211,7 @@ function nutritionPanel(g: G, x: number, y: number, w: number, rows: LabelRow[],
     if (row.value == null) {
       g.fillStyle = '#8a5a00';
       font(g, 600, 26, MONO);
-      g.fillText(`[x] ${row.unit}`, r, yy - 14);
+      g.fillText('—', r, yy - 14);
     } else {
       font(g, row.bold ? 800 : 600, row.id === 'energy' ? 32 : 28, MONO);
       g.fillText(`${row.value} ${row.unit}`, r, yy - 14);
@@ -219,7 +223,7 @@ function nutritionPanel(g: G, x: number, y: number, w: number, rows: LabelRow[],
   yy += 40;
   g.fillStyle = '#444';
   font(g, 500, 18, SANS);
-  wrapText(g, '[x] = to be confirmed against the current label.', l, yy, r - l, 22);
+  wrapText(g, 'Values per serving. Concept build: figures not from the source document are mock values.', l, yy, r - l, 22);
 }
 
 export interface WrapLabelSpec {
@@ -402,7 +406,7 @@ export function drawWrapLabel(spec: WrapLabelSpec, scale = 1, W = 4096, H = 1000
     font(g, 800, 40, SANS);
     g.fillText('Nutrition information', nx, 140);
     font(g, 500, 26, SANS);
-    g.fillText('See the label for full values: [x]', nx, 190);
+    g.fillText('Values per serving on the pack.', nx, 190);
   }
 
   // ---- Back-left: directions + authenticity ----
@@ -445,7 +449,7 @@ export function drawWrapLabel(spec: WrapLabelSpec, scale = 1, W = 4096, H = 1000
   font(g, 500, 21, SANS);
   wrapText(g, 'These products are not intended to diagnose, treat, cure or prevent any disease. Consult a healthcare professional before use.', dx, 720, 760, 26);
   font(g, 600, 21, MONO);
-  g.fillText('BATCH [B-XXXX]   MFD [date]   BEST BEFORE [date]   FSSAI LIC. [x]', dx, 830);
+  g.fillText(BATCH_LINE, dx, 830);
 
   if (withGrain) grain(g, 0, 0, W, H, 6);
   return c;
@@ -691,14 +695,13 @@ export function drawPouchBack(spec: PouchSpec, nutrition: WrapLabelSpec['nutriti
     font(g, 900, 64, SANS);
     g.fillText('Nutrition Facts', 160, 390);
     font(g, 500, 34, SANS);
-    g.fillText('Values per 100 g: [x]', 160, 460);
-    g.fillText('To be supplied from the current label.', 160, 510);
+    g.fillText('Values per 100 g on the pack.', 160, 460);
   }
   g.fillStyle = 'rgba(255,255,255,.85)';
   font(g, 500, 28, SANS);
   wrapText(g, 'These products are not intended to diagnose, treat, cure or prevent any disease. Consult a healthcare professional before use.', 120, 1500, W - 240, 36);
   font(g, 600, 26, MONO);
-  g.fillText('BATCH [B-XXXX]   ·   MFD [date]   ·   FSSAI LIC. [x]', 120, 1700);
+  g.fillText(BATCH_LINE.replace(/   /g, '   ·   '), 120, 1700);
   grain(g, 0, 0, W, H, 6);
   return c;
 }

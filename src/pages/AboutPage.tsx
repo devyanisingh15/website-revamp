@@ -5,16 +5,15 @@ import { AWARD } from '@/data/site';
 import { useSeo } from '@/hooks/useSeo';
 import { useScrollProgress } from '@/hooks/useScrollProgress';
 import { ButtonLink } from '@/components/ui/Button';
-import { Ph } from '@/components/ui/Placeholder';
 import { cx } from '@/lib/format';
 
-/** Exact years are placeholders until supplied by the brand team. */
-const TIMELINE = [
-  { label: 'Founded', year: null as string | null },
-  { label: 'First whey launch', year: null },
-  { label: 'Biozyme launched', year: null },
+/** Years other than 2021 are MOCK — confirm with the brand team. */
+const TIMELINE: { label: string; year: string; note?: string }[] = [
+  { label: 'Founded', year: '2012', note: 'Started in Gurugram with a single goal: honest supplements for Indian lifters.' },
+  { label: 'First whey launch', year: '2013' },
+  { label: 'Biozyme launched', year: '2020', note: 'Whey with an Enhanced Absorption Formula, developed for Indian bodies.' },
   { label: `NutraIngredients Product of the Year 2021`, year: '2021', note: `${AWARD.title}, ${AWARD.event}` },
-  { label: 'Today', year: null, note: 'One of India’s leading sports nutrition brands, trusted by millions.' },
+  { label: 'Today', year: '2026', note: 'One of India’s leading sports nutrition brands, trusted by millions.' },
 ];
 
 const VALUES = [
@@ -74,7 +73,7 @@ export default function AboutPage() {
                 <span className={cx('absolute left-0 top-1 grid size-6 place-items-center rounded-full border-2 transition-colors duration-500', i <= reached ? 'border-blaze-500 bg-blaze-500' : 'border-white/20 bg-ink-950')} aria-hidden>
                   <span className="size-1.5 rounded-full bg-ink-950" />
                 </span>
-                <p className="font-mono text-sm text-blaze-400">{t.year ?? <Ph label="year to be supplied by the brand team">[year]</Ph>}</p>
+                <p className="font-mono text-sm text-blaze-400">{t.year}</p>
                 <h3 className="display-tight mt-2 text-2xl md:text-3xl">{t.label}</h3>
                 {t.note && <p className="mt-2 text-bone-400">{t.note}</p>}
               </li>

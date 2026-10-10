@@ -8,7 +8,7 @@ import { listOrders } from '@/lib/api/orders';
 import { readJSON, writeJSON } from '@/lib/storage';
 import { Field } from '@/components/ui/Field';
 import { Button } from '@/components/ui/Button';
-import { MockTag, Ph } from '@/components/ui/Placeholder';
+import { MockTag } from '@/components/ui/Placeholder';
 import { OrderTimeline } from '@/components/ecommerce/OrderTimeline';
 import { formatDate, formatINR } from '@/lib/format';
 
@@ -88,9 +88,7 @@ export default function AccountPage() {
             <p className="mt-4 text-sm text-bone-300">
               Earn {SITE.loyaltyProgrammeName} on every order {!SITE.loyaltyNameConfirmed && <MockTag className="ml-1">Name to confirm</MockTag>}
             </p>
-            <p className="display-tight mt-6 text-4xl">
-              <Ph label="rewards balance">[x]</Ph>
-            </p>
+            <p className="display-tight mt-6 text-4xl tabular-nums">{SITE.loyaltyBalance.toLocaleString('en-IN')}</p>
             <p className="text-sm text-bone-400">{SITE.loyaltyProgrammeName} balance</p>
           </section>
 

@@ -2,7 +2,7 @@ import { Link } from 'react-router-dom';
 import { FOOTER_COLUMNS, LEGAL_LINKS, TAGLINES } from '@/data/navigation';
 import { SITE } from '@/data/site';
 import { Logo } from './Logo';
-import { Ph, MockTag } from '../ui/Placeholder';
+import { MockTag } from '../ui/Placeholder';
 
 export function Footer() {
   return (
@@ -43,7 +43,7 @@ export function Footer() {
                 </li>
               ))}
               <li>
-                FSSAI licence no. {SITE.fssaiLicence ?? <Ph label="FSSAI licence number to be supplied">[x]</Ph>}
+                FSSAI licence no. {SITE.fssaiLicence}
               </li>
             </ul>
             <p className="flex items-center gap-2">

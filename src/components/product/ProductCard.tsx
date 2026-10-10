@@ -11,7 +11,6 @@ import { ProductArt } from './ProductArt';
 import { FlavourSelector } from './FlavourSelector';
 import { Price } from '../ui/Price';
 import { Rating } from '../ui/Rating';
-import { Ph } from '../ui/Placeholder';
 
 const BADGE_STYLE: Record<string, string> = {
   Bestseller: 'bg-blaze-500 text-white',
@@ -88,14 +87,12 @@ export function ProductCard({ product, tone = 'dark', compare = false, priority 
         <p className="font-mono text-xs uppercase tracking-wider opacity-70">
           {product.nutrition.protein != null ? (
             <>
-              <span className="text-blaze-500">{product.nutrition.protein} g</span> protein per scoop
+              <span className="text-blaze-500">{product.nutrition.protein} g</span> protein per {product.nutrition.servingLabel ?? 'scoop'}
             </>
-          ) : product.proteinType ? (
-            <>
-              <Ph label="protein per scoop to be confirmed">[x] g</Ph> protein per scoop
-            </>
+          ) : product.keySpecs?.length ? (
+            <span className="text-blaze-500">{product.keySpecs[0]}</span>
           ) : (
-            <span className="normal-case tracking-normal">{product.oneLiner ?? ' '}</span>
+            <span className="normal-case tracking-normal">{product.oneLiner}</span>
           )}
         </p>
         <Rating rating={product.rating} count={product.reviewCount} />

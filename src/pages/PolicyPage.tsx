@@ -1,5 +1,7 @@
 import { Link, useParams } from 'react-router-dom';
 import { useSeo } from '@/hooks/useSeo';
+import { POLICY_PAGES } from '@/data/pages';
+import { CopyBody } from '@/components/content/CopyBody';
 import NotFoundPage from './NotFoundPage';
 
 const POLICIES: Record<string, string> = { privacy: 'Privacy Policy', terms: 'Terms', returns: 'Return Policy' };
@@ -7,7 +9,7 @@ const POLICIES: Record<string, string> = { privacy: 'Privacy Policy', terms: 'Te
 export default function PolicyPage() {
   const { policy = '' } = useParams();
   const title = POLICIES[policy];
-  useSeo({ title: `${title ?? 'Policies'}, MuscleBlaze`, description: `MuscleBlaze ${title ?? 'policies'}.` });
+  useSeo({ title: `${title ?? 'Policies'}, MuscleBlaze`, description: POLICY_PAGES[policy]?.intro ?? 'MuscleBlaze policies.' });
   if (!title) return <NotFoundPage />;
   return (
     <div className="bg-ink-950">
@@ -25,10 +27,7 @@ export default function PolicyPage() {
         </nav>
         <article className="max-w-3xl lg:col-span-8">
           <h1 className="display text-display-md">{title}</h1>
-          <div className="mt-10 rounded-md border border-dashed border-amber-signal/40 p-8">
-            <p className="eyebrow text-amber-signal">Legal copy placeholder</p>
-            <p className="mt-3 text-bone-300">The {title.toLowerCase()} text must be supplied by the MuscleBlaze legal team. This template renders headings, lists and tables from the CMS.</p>
-          </div>
+          <CopyBody page={POLICY_PAGES[policy]} />
         </article>
       </div>
     </div>

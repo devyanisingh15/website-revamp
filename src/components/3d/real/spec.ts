@@ -56,11 +56,12 @@ const LINES: Record<string, { lines: string[]; hero: string; category?: string }
 };
 
 export function packSpec(p: Product, flavour?: Flavour, size?: string): PackSpec {
-  // Net weight printed on the pack: chosen size, else the product's first size; [x] when TBC
+  // Net weight printed on the pack: chosen size, else the product's first size
   const first = p.sizes[0]?.label ?? '';
-  const sizeLabel = size ?? (/tbc/i.test(first) ? '[x] g' : first);
+  const sizeLabel = size ?? first;
+  const servings = (p.sizes.find((s) => s.label === sizeLabel) ?? p.sizes[0])?.servings ?? null;
   const fl = flavour && flavour.family !== 'tbc' ? flavour : undefined;
-  const flavourName = fl?.name ?? (p.flavours[0]?.family === 'tbc' ? 'Flavour TBC' : p.flavours[0]?.name ?? '');
+  const flavourName = fl?.name ?? p.flavours.find((f) => f.family !== 'tbc')?.name ?? '';
   const flavourColor = fl?.color ?? '#6b4029';
   const accent = ACCENT[p.id] ?? MB_YELLOW;
   const powder = fl?.color ?? '#e9dfcb';
@@ -79,8 +80,9 @@ export function packSpec(p: Product, flavour?: Flavour, size?: string): PackSpec
     badgeBig: p.isClinicallyTested ? '50%' : undefined,
     features: isBiozyme ? ['Enhanced Absorption Formula (EAF)', 'Tested on Indian bodies'] : ['Lab verified', 'Authenticity code on every tub'],
     certified: isBiozyme,
-    nutrition: p.nutrition.sourced ? p.nutrition : null,
-    servings: null,
+    // sourced figures, or the concept build's mock values when the product has macros
+    nutrition: p.nutrition.sourced || p.nutrition.protein != null ? p.nutrition : null,
+    servings,
   });
 
   // Choosing a sachet size on a tub product shows the sachet
@@ -110,14 +112,14 @@ export function packSpec(p: Product, flavour?: Flavour, size?: string): PackSpec
         body: '#2b2c30',
         cap: '#2b2c30',
         powder,
-        pouch: { brand: 'MB', lines: ['BIOZYME', 'WHEY'], accent: '#3a3b3f', flavourName, netWeight: '36 g', stripLeft: '1 serve', stripRight: p.nutrition.protein ? `${p.nutrition.protein}g Protein` : 'Protein [x] g', descriptor: 'Trial sachet', illustration: 'none' },
+        pouch: { brand: 'MB', lines: ['BIOZYME', 'WHEY'], accent: '#3a3b3f', flavourName, netWeight: '36 g', stripLeft: '1 serve', stripRight: p.nutrition.protein ? `${p.nutrition.protein}g Protein` : 'High Protein', descriptor: 'Trial sachet', illustration: 'none' },
       };
     case 'bottle': {
       const name = p.shortName.toUpperCase();
       return { kind: 'bottle', body: '#1d1e21', cap: '#e8202a', powder, bottle: { name, sub: 'DAILY ESSENTIALS', accent: p.id === 'fish-oil' ? '#e3a62b' : p.id === 'multivitamin' ? '#3fb36b' : '#3a8de0', base: CHARCOAL } };
     }
     case 'bar':
-      return { kind: 'bar', body: '#4a2a1a', cap: '#4a2a1a', powder, bar: { name: 'Protein Bar', accent: '#7a3b22', flavour: 'Flavour TBC' } };
+      return { kind: 'bar', body: '#4a2a1a', cap: '#4a2a1a', powder, bar: { name: 'Protein Bar', accent: '#7a3b22', flavour: flavourName || 'Choco Almond' } };
     case 'shaker':
     default:
       return { kind: 'shaker', body: '#141416', cap: '#141416', powder };

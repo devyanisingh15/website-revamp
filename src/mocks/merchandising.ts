@@ -1,7 +1,7 @@
 import type { Badge } from '@/data/types';
 
 /**
- * DEMO MERCHANDISING — placeholder until the commerce team supplies it.
+ * MOCK MERCHANDISING — replace with data from the commerce team.
  * Badge assignment, "recommended" order and "bestselling" order are
  * merchandising decisions backed by sales data we do not have.
  * The only badge grounded in the content document is Iso Zero → Low Carb.

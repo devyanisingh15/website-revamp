@@ -23,7 +23,7 @@ export function Bestsellers() {
             <ProductCard key={p.id} product={p} tone="light" />
           ))}
         </div>
-        <p className="mt-10 font-mono text-[11px] uppercase tracking-wider text-ink-500">Badges, ratings and prices are placeholders until merchandising, reviews and pricing data are connected.</p>
+        <p className="mt-10 font-mono text-[11px] uppercase tracking-wider text-ink-500">Badges, ratings and prices are demo values for this concept build.</p>
       </div>
     </section>
   );

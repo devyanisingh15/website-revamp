@@ -37,8 +37,8 @@ type Manifest = Record<string, { width: number; height: number; elements: { x: n
 const MANIFEST = manifest as Manifest;
 
 const CAM_Z = 6;
-const IMG_W = 3.3; // artwork width at the tub's depth (world units)
-const TUB_SCALE = 0.52;
+const IMG_W = 2.7; // artwork width at the tub's depth (world units) — ~84% of the view, leaving room for parallax and float
+const TUB_SCALE = 0.44;
 const IN_DUR = 1.25;
 const OUT_DUR = 0.65;
 
@@ -283,8 +283,8 @@ function Burst({ flavourId }: FlavourBurstProps) {
     }
     // Camera: slow drift + pointer parallax (the cards' depths do the rest)
     const k = reduced ? 1 : 1 - Math.exp(-3 * dt);
-    const tx = reduced ? 0 : pointer.x * 0.55 + Math.sin(now * 0.23) * 0.18;
-    const ty = reduced ? 0.1 : 0.1 + pointer.y * 0.3 + Math.sin(now * 0.31) * 0.06;
+    const tx = reduced ? 0 : pointer.x * 0.35 + Math.sin(now * 0.23) * 0.12;
+    const ty = reduced ? 0.1 : 0.1 + pointer.y * 0.2 + Math.sin(now * 0.31) * 0.05;
     camera.position.x += (tx - camera.position.x) * k;
     camera.position.y += (ty - camera.position.y) * k;
     camera.position.z = CAM_Z;

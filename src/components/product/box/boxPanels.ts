@@ -4,8 +4,9 @@
  * as 3D textures and as the flat fallback image, so both always match.
  * No three.js import here — this module stays in the light main bundle.
  *
- * Only figures from the content document are printed as values; every other
- * label row renders "[x]" until the live label is supplied.
+ * Values come from the product's `nutrition` (sourced figures for Biozyme
+ * Performance, MOCK values elsewhere — see src/data/products.ts). A row with
+ * no value renders "—".
  */
 
 export type BoxFace = 'front' | 'right' | 'back' | 'left';
@@ -29,7 +30,7 @@ export type LabelRowId = 'energy' | 'protein' | 'eaas' | 'bcaas' | 'carbs' | 'su
 export interface LabelRow {
   id: LabelRowId;
   label: string;
-  value: string | null; // null → "[x]" placeholder
+  value: string | null; // null → "—"
   unit: string;
   level: 0 | 1 | 2; // indentation ("of which")
   bold?: boolean;
@@ -50,21 +51,34 @@ export interface BoxData {
   disclaimer: string;
 }
 
-export function labelRows(n: { protein: number | null; eaas: number | null; bcaas: number | null; calories: number | null; carbs: number | null }): LabelRow[] {
-  const v = (x: number | null) => (x == null ? null : String(x));
+export function labelRows(n: {
+  protein: number | null;
+  eaas: number | null;
+  bcaas: number | null;
+  calories: number | null;
+  carbs: number | null;
+  sugars?: number | null;
+  fat?: number | null;
+  sodium?: number | null;
+}): LabelRow[] {
+  const v = (x: number | null | undefined) => (x == null ? null : String(x));
   return [
     { id: 'energy', label: 'Energy', value: n.calories == null ? null : `~${n.calories}`, unit: 'kcal', level: 0, bold: true },
     { id: 'protein', label: 'Protein', value: v(n.protein), unit: 'g', level: 0, bold: true },
     { id: 'eaas', label: 'of which EAAs', value: v(n.eaas), unit: 'g', level: 1 },
     { id: 'bcaas', label: 'of which BCAAs', value: v(n.bcaas), unit: 'g', level: 2 },
     { id: 'carbs', label: 'Carbohydrate', value: v(n.carbs), unit: 'g', level: 0, bold: true },
-    { id: 'sugars', label: 'of which Sugars', value: null, unit: 'g', level: 1 },
-    { id: 'fat', label: 'Total Fat', value: null, unit: 'g', level: 0, bold: true },
-    { id: 'sodium', label: 'Sodium', value: null, unit: 'mg', level: 0, bold: true },
+    { id: 'sugars', label: 'of which Sugars', value: v(n.sugars), unit: 'g', level: 1 },
+    { id: 'fat', label: 'Total Fat', value: v(n.fat), unit: 'g', level: 0, bold: true },
+    { id: 'sodium', label: 'Sodium', value: v(n.sodium), unit: 'mg', level: 0, bold: true },
   ];
 }
 
 import { drawMB, molecules, MB_YELLOW } from '@/components/3d/real/labelArt';
+import { SITE } from '@/data/site';
+
+/** MOCK — batch line printed on the carton; real values come from the packaging line. */
+const MOCK_BATCH = { batch: 'B-2608-14', mfd: 'AUG 2026', bestBefore: 'JAN 2028' };
 
 const SANS = '"Archivo Variable", Archivo, system-ui, sans-serif';
 const MONO = '"JetBrains Mono", ui-monospace, monospace';
@@ -211,9 +225,9 @@ function drawBack(g: CanvasRenderingContext2D, W: number, H: number, d: BoxData,
 
   g.letterSpacing = '0px';
   g.font = `500 38px ${SANS}`;
-  g.fillText(`Serving size: 1 scoop (${d.servingSize ?? '[x] g'})`, x, y);
+  g.fillText(d.servingSize ? `Serving size: 1 scoop (${d.servingSize})` : 'Serving size: 1 scoop', x, y);
   y += 52;
-  g.fillText(`Servings per pack: ${d.servingsPerPack ?? '[x]'}`, x, y);
+  g.fillText(d.servingsPerPack ? `Servings per pack: ${d.servingsPerPack}` : 'Servings per pack: see pack', x, y);
   y += 30;
   g.fillRect(x, y, r - x, 18);
   y += 62;
@@ -243,7 +257,7 @@ function drawBack(g: CanvasRenderingContext2D, W: number, H: number, d: BoxData,
     if (row.value == null) {
       g.fillStyle = '#9a6a10';
       g.font = `600 40px ${MONO}`;
-      g.fillText(`[x] ${row.unit} †`, r, y - 22);
+      g.fillText('—', r, y - 22);
     } else {
       g.font = `${row.bold ? 800 : 600} ${row.id === 'energy' ? 52 : 44}px ${MONO}`;
       g.fillText(`${row.value} ${row.unit}`, r, y - 22);
@@ -255,13 +269,13 @@ function drawBack(g: CanvasRenderingContext2D, W: number, H: number, d: BoxData,
   y += 56;
   g.fillStyle = '#3a3a40';
   g.font = `500 28px ${SANS}`;
-  y = wrap(g, '† Not yet supplied — to be confirmed against the current label. Other figures from public listings.', x, y, r - x, 38);
+  y = wrap(g, 'Approximate values. Concept artwork with mock figures; confirm against the current label.', x, y, r - x, 38);
 
   // Below the panel: batch + disclaimer in the carton colour
   const dark = lum(d.body) < 0.5;
   g.fillStyle = dark ? 'rgba(242,239,233,.7)' : 'rgba(10,10,11,.7)';
   g.font = `600 26px ${MONO}`;
-  g.fillText('BATCH [B-XXXX]   ·   MFD [date]   ·   BEST BEFORE [date]', px, H - 90);
+  g.fillText(`BATCH ${MOCK_BATCH.batch}   ·   MFD ${MOCK_BATCH.mfd}   ·   BEST BEFORE ${MOCK_BATCH.bestBefore}`, px, H - 90);
 }
 
 function drawRight(g: CanvasRenderingContext2D, W: number, H: number, d: BoxData) {
@@ -342,7 +356,7 @@ function drawLeft(g: CanvasRenderingContext2D, W: number, H: number, d: BoxData)
   y = wrap(g, 'Enter your batch number at muscleblaze.com/authenticity', x, y + 4, maxW, 36);
   g.font = `500 22px ${SANS}`;
   wrap(g, d.disclaimer, x, Math.max(y + 30, H - 230), maxW, 30);
-  g.fillText('FSSAI Lic. No. [x]', x, H - 50);
+  g.fillText(`FSSAI Lic. No. ${SITE.fssaiLicence}`, x, H - 50);
 }
 
 /** Draws one face into `canvas` (created if omitted) and returns it. */

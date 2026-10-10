@@ -125,7 +125,7 @@ export default function CartPage() {
                   <ProductArt art={shaker.art} shadow={false} />
                 </span>
                 <p className="flex-1 text-sm">
-                  <span className="font-semibold">Add a shaker for {shakerPrice ? formatINR(shakerPrice) : '₹[x]'}</span>
+                  <span className="font-semibold">{shakerPrice ? `Add a shaker for ${formatINR(shakerPrice)}` : 'Add a shaker'}</span>
                 </p>
                 <Button size="sm" variant="secondary" icon={<Plus className="size-4" />} onClick={(e) => addToCart({ productId: shaker.id, flavourId: null, sizeId: shaker.sizes[0].id, from: e.currentTarget })}>
                   Add

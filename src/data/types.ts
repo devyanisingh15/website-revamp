@@ -1,7 +1,8 @@
 /**
- * Domain types. Values typed `number | null` are unknown until connected to
- * the product information system — the UI renders a visible placeholder for
- * every null instead of guessing.
+ * Domain types. The catalogue is currently filled with MOCK values (see
+ * `src/data/products.ts`) — replace with the product information system.
+ * Fields typed `number | null` mean "not applicable" for that product
+ * (e.g. protein in creatine) rather than "unknown".
  */
 
 export type CategoryId =
@@ -40,7 +41,7 @@ export interface PackSize {
   id: string;
   label: string;
   family: PackFamily;
-  /** Servings per pack — null until confirmed from label */
+  /** Servings per pack (MOCK unless stated). null = not applicable (e.g. a shaker) */
   servings: number | null;
 }
 
@@ -50,7 +51,19 @@ export interface Nutrition {
   bcaas: number | null;
   eaas: number | null;
   calories: number | null;
-  /** True only where the figure is taken from the supplied content document */
+  /** Extra label rows — MOCK values for the concept build */
+  sugars?: number | null;
+  fat?: number | null;
+  /** mg per serving */
+  sodium?: number | null;
+  /** e.g. "36 g" — MOCK */
+  servingSize?: string | null;
+  /** What one serving is called on cards: "scoop", "serving", "bar"… */
+  servingLabel?: string;
+  /**
+   * True only where protein / EAAs / BCAAs / calories are taken from the
+   * supplied content document (Biozyme Performance). Everything else is mock.
+   */
   sourced: boolean;
 }
 
@@ -68,16 +81,18 @@ export interface Product {
   name: string;
   shortName: string;
   category: CategoryId;
-  oneLiner: string | null;
+  oneLiner: string;
   whoItsFor?: string;
   proteinType: ProteinType | null;
   goals: FilterGoal[];
   nutrition: Nutrition;
+  /** Short spec chips shown under the title when there are no protein macros — MOCK */
+  keySpecs?: string[];
   flavours: Flavour[];
   sizes: PackSize[];
-  /** Ratings come from the reviews service; null until connected */
-  rating: number | null;
-  reviewCount: number | null;
+  /** MOCK — ratings come from the reviews service once connected */
+  rating: number;
+  reviewCount: number;
   art: ProductArt;
   /** Path to a Draco-compressed GLB once the 3D team supplies it */
   model3d: string | null;

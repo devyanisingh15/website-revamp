@@ -12,7 +12,7 @@ interface Props {
   className?: string;
 }
 
-/** Price block — "₹[price] · MRP ₹[mrp] · You save [x]% · Price per serving ₹[y]" */
+/** Price block — price · MRP · saving % · price per serving. Values come from src/mocks/pricing.ts (MOCK). */
 export function Price({ productId, sizeId, servings, size = 'md', showMrp = true, showPerServing = false, className }: Props) {
   const p = PRICE_MODE === 'demo' ? getPrice(productId, sizeId) : null;
   const main = size === 'lg' ? 'text-3xl md:text-4xl' : size === 'md' ? 'text-lg' : 'text-base';
@@ -50,12 +50,11 @@ export function Price({ productId, sizeId, servings, size = 'md', showMrp = true
         </>
       )}
       <MockTag className="self-center">Demo price</MockTag>
-      {showPerServing && (
+      {showPerServing && servings ? (
         <span className="basis-full font-mono text-xs opacity-70">
-          Price per serving{' '}
-          {servings ? formatINR(p.price / servings) : <>₹<Ph>[y]</Ph></>}
+          Price per serving {formatINR(p.price / servings)}
         </span>
-      )}
+      ) : null}
     </div>
   );
 }
