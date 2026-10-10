@@ -123,37 +123,119 @@ function Viewer({ product, flavourId, sizeLabel, flavourColor, flavourName }: { 
   );
 }
 
-function WhyBiozyme({ powder }: { powder: string }) {
-  const [focus, setFocus] = useState(WHY[0].id);
+/**
+ * WHY BIOZYME + NUTRITION — one section, one 3D scoop.
+ * The Why list (Biozyme only) shows numbered hotspots on the scoop; the macro tiles
+ * light up each nutrient's share of the scoop's protein. Picking one clears the other
+ * so the scoop always tells one story at a time.
+ */
+function ScoopStory({ product, powder, showWhy }: { product: Product; powder: string; showWhy: boolean }) {
+  const n = product.nutrition;
+  const [macro, setMacro] = useState<Macro>(showWhy ? null : 'protein');
+  const [focus, setFocus] = useState<string | null>(showWhy ? WHY[0].id : null);
+  const pickWhy = (id: string) => {
+    setFocus(id);
+    setMacro(null);
+  };
+  const pickMacro = (m: Exclude<Macro, null>) => {
+    setMacro(m);
+    setFocus(null);
+  };
+  const rows: { id: Exclude<Macro, null>; label: string; value: string; sub?: string; dot: string }[] = [
+    { id: 'protein', label: 'Protein', value: `${n.protein} g`, dot: 'bg-blaze-500' },
+    { id: 'eaas', label: 'EAAs', value: `${n.eaas} g`, sub: 'of the protein', dot: 'bg-amber-signal' },
+    { id: 'bcaas', label: 'BCAAs', value: `${n.bcaas} g`, sub: 'of the EAAs', dot: 'bg-proof-500' },
+    { id: 'calories', label: 'Calories', value: `~${n.calories} kcal`, dot: 'bg-bone-100' },
+  ];
+  const hasAminos = n.eaas != null && n.bcaas != null;
+  const shownRows = hasAminos ? rows : rows.filter((r) => r.id === 'protein' || r.id === 'calories');
+
   return (
-    <section aria-labelledby="why-title" className="border-t hairline bg-ink-950 py-20 md:py-28">
-      <div className="container-x grid gap-12 lg:grid-cols-12 lg:items-center">
+    <section aria-labelledby="scoop-title" className="border-t hairline bg-ink-950 py-20 md:py-28">
+      <div className="container-x grid gap-12 lg:grid-cols-12 lg:items-start">
         <div className="lg:col-span-5">
-          <h2 id="why-title" className="display text-display-md">
-            Why Biozyme
+          <p className="eyebrow text-bone-400">{showWhy ? 'Why Biozyme · Nutrition' : 'Nutrition'}</p>
+          <h2 id="scoop-title" className="display mt-4 text-display-md">
+            {showWhy ? 'What’s in Every Scoop' : 'Nutrition'}
           </h2>
-          <ol className="mt-8 border-t hairline">
-            {WHY.map((w, i) => (
-              <li key={w.id} className="border-b hairline">
-                <button onClick={() => setFocus(w.id)} aria-expanded={focus === w.id} className="flex w-full gap-4 py-4 text-left">
-                  <span className={cx('grid size-7 shrink-0 place-items-center rounded-full font-mono text-xs transition-colors', focus === w.id ? 'bg-proof-400 text-ink-950' : 'border border-white/25')}>{i + 1}</span>
-                  <span>
-                    <span className="block font-semibold">{w.title}</span>
-                    {focus === w.id && <span className="mt-1 block animate-rise text-sm leading-relaxed text-bone-300">{w.body}</span>}
-                  </span>
-                </button>
-              </li>
-            ))}
-          </ol>
+
+          {showWhy && (
+            <ol className="mt-8 border-t hairline" aria-label="Why Biozyme">
+              {WHY.map((w, i) => (
+                <li key={w.id} className="border-b hairline">
+                  <button onClick={() => pickWhy(w.id)} aria-expanded={focus === w.id} className="flex w-full gap-4 py-4 text-left">
+                    <span className={cx('grid size-7 shrink-0 place-items-center rounded-full font-mono text-xs transition-colors', focus === w.id ? 'bg-proof-400 text-ink-950' : 'border border-white/25')}>{i + 1}</span>
+                    <span>
+                      <span className="block font-semibold">{w.title}</span>
+                      {focus === w.id && <span className="mt-1 block animate-rise text-sm leading-relaxed text-bone-300">{w.body}</span>}
+                    </span>
+                  </button>
+                </li>
+              ))}
+            </ol>
+          )}
         </div>
-        <div className="relative aspect-square lg:col-span-7">
-          <Stage3D
-            load={loadScoop}
-            sceneProps={{ powder, macro: null as Macro, eaaShare: 11.75 / 25, bcaaShare: 5.51 / 25, hotspots: WHY.map(({ id, pos }) => ({ id, pos })), focus, onFocus: setFocus }}
-            className="absolute inset-0"
-            label="3D scoop of Biozyme powder with five numbered hotspots matching the Why Biozyme list."
-            fallback={<ScoopFallback powder={powder} />}
-          />
+
+        <div className="lg:col-span-7">
+          <div className="relative aspect-[4/3] overflow-hidden rounded-md bg-[radial-gradient(70%_60%_at_50%_45%,#1c1418,#0b0b0c_70%)]">
+            <Stage3D
+              load={loadScoop}
+              sceneProps={{
+                powder,
+                macro,
+                eaaShare: (n.eaas ?? 0) / (n.protein ?? 1),
+                bcaaShare: (n.bcaas ?? 0) / (n.protein ?? 1),
+                hotspots: showWhy && !macro ? WHY.map(({ id, pos }) => ({ id, pos })) : [],
+                focus,
+                onFocus: pickWhy,
+              }}
+              className="absolute inset-0"
+              label={showWhy ? 'Scoop of Biozyme powder. Numbered hotspots match the Why Biozyme list; the nutrition tiles highlight each nutrient’s share of the scoop. Values are in the table.' : `Scoop of powder. The highlighted particles show ${macro ?? 'protein'} as a share of the scoop's protein. Values are in the table.`}
+              fallback={<ScoopFallback powder={powder} macro={macro ?? undefined} />}
+            />
+            <p className="pointer-events-none absolute bottom-3 left-4 font-mono text-[10px] uppercase tracking-wider text-bone-400">
+              {showWhy ? 'Tap a reason or a nutrient · illustrative' : 'Tap a nutrient to highlight it · illustrative'}
+            </p>
+          </div>
+
+          {/* Nutrition per serving — a table, laid out as tiles that drive the scoop */}
+          <table className="mt-4 w-full border-collapse">
+            <caption className="sr-only">Nutrition per serving (approx.)</caption>
+            <thead className="sr-only">
+              <tr>
+                <th scope="col">Nutrient</th>
+                <th scope="col">Per serving</th>
+              </tr>
+            </thead>
+            <tbody className={cx('grid gap-2', shownRows.length === 4 ? 'grid-cols-2 sm:grid-cols-4' : 'grid-cols-2')}>
+              {shownRows.map((r) => (
+                <tr key={r.id} className="contents">
+                  <th scope="row" className="p-0 font-normal">
+                    <button
+                      onClick={() => pickMacro(r.id)}
+                      aria-pressed={macro === r.id}
+                      className={cx('flex h-full w-full flex-col items-start rounded-sm border p-4 text-left transition-colors', macro === r.id ? 'border-white/60 bg-white/[0.06]' : 'hairline hover:border-white/40')}
+                    >
+                      <span className="flex items-center gap-2 text-sm text-bone-300">
+                        <span className={cx('size-2.5 rounded-full', macro === r.id ? r.dot : 'bg-white/20')} aria-hidden />
+                        {r.label}
+                      </span>
+                      <span className="mt-2 font-mono text-xl text-bone-100 md:text-2xl">{r.value}</span>
+                      {r.sub && <span className="mt-0.5 text-xs text-bone-500">{r.sub}</span>}
+                    </button>
+                  </th>
+                  <td className="sr-only">{r.value}</td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+          <p className="mt-4 text-sm text-bone-400">
+            Per serving (approx.). Full values by flavour:{' '}
+            <a href="#label-title" className="font-semibold text-bone-100 underline underline-offset-4">
+              read the label ↓
+            </a>
+          </p>
+          <p className="mt-1 text-xs text-bone-500">{n.sourced ? 'Figures from public listings; confirm against the current label before launch.' : 'Mock figures for this concept build; replace with the current label values before launch.'}</p>
         </div>
       </div>
     </section>
@@ -176,70 +258,6 @@ function ScoopFallback({ powder, macro }: { powder: string; macro?: Macro }) {
         <circle key={i} cx={d.x} cy={d.y} r={2.6} fill={d.rank < lit ? color : powder} style={{ transition: 'fill .4s' }} />
       ))}
     </svg>
-  );
-}
-
-function NutritionPanel({ product, powder }: { product: Product; powder: string }) {
-  const [macro, setMacro] = useState<Macro>('protein');
-  const n = product.nutrition;
-  const rows: { id: Exclude<Macro, null>; label: string; value: string; sub?: string }[] = [
-    { id: 'protein', label: 'Protein', value: `${n.protein} g` },
-    { id: 'eaas', label: 'EAAs', value: `${n.eaas} g`, sub: 'Share of the protein' },
-    { id: 'bcaas', label: 'BCAAs', value: `${n.bcaas} g`, sub: 'Share of the EAAs' },
-    { id: 'calories', label: 'Calories', value: `~${n.calories} kcal` },
-  ];
-  return (
-    <section aria-labelledby="nutrition-title" className="surface-bone py-20 md:py-28">
-      <div className="container-x grid gap-12 lg:grid-cols-12 lg:items-center">
-        <div className="relative order-2 aspect-square rounded-md bg-ink-950 lg:order-1 lg:col-span-6">
-          <Stage3D
-            load={loadScoop}
-            sceneProps={{ powder, macro, eaaShare: (n.eaas ?? 0) / (n.protein ?? 1), bcaaShare: (n.bcaas ?? 0) / (n.protein ?? 1) }}
-            className="absolute inset-0"
-            label={`Scoop of powder. The highlighted particles show ${macro ?? 'nothing'} as a share of the scoop's protein. The values are in the table.`}
-            fallback={<ScoopFallback powder={powder} macro={macro} />}
-          />
-          <p className="absolute bottom-4 left-4 font-mono text-[10px] uppercase tracking-wider text-bone-400">Tap a macro to highlight it · illustrative</p>
-        </div>
-        <div className="order-1 lg:order-2 lg:col-span-5 lg:col-start-8">
-          <h2 id="nutrition-title" className="display text-display-md">
-            Nutrition
-          </h2>
-          <table className="mt-8 w-full border-collapse text-left">
-            <caption className="sr-only">Nutrition per serving (approx.)</caption>
-            <thead>
-              <tr className="border-b hairline-dark text-xs text-ink-600">
-                <th scope="col" className="pb-3 font-normal">Per serving (approx.)</th>
-                <th scope="col" className="pb-3 text-right font-normal">Amount</th>
-              </tr>
-            </thead>
-            <tbody>
-              {rows.map((r) => (
-                <tr key={r.id} className="border-b hairline-dark">
-                  <th scope="row" className="p-0 font-normal">
-                    <button onClick={() => setMacro(r.id)} aria-pressed={macro === r.id} className={cx('flex w-full items-center gap-3 py-4 text-left text-lg transition-colors', macro === r.id ? 'font-bold text-ink-950' : 'text-ink-700 hover:text-ink-950')}>
-                      <span className={cx('size-3 rounded-full transition-colors', macro === r.id ? (r.id === 'protein' ? 'bg-blaze-500' : r.id === 'eaas' ? 'bg-amber-signal' : r.id === 'bcaas' ? 'bg-proof-500' : 'bg-ink-950') : 'bg-ink-950/15')} aria-hidden />
-                      {r.label}
-                      {r.sub && <span className="text-xs font-normal text-ink-500">{r.sub}</span>}
-                    </button>
-                  </th>
-                  <td className="py-4 text-right font-mono text-lg">{r.value}</td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-          <p className="mt-4 text-sm text-ink-600">
-            Full values by flavour:{' '}
-            <a href="#label-title" className="font-semibold text-ink-950 underline underline-offset-4">
-              read the label ↓
-            </a>
-          </p>
-          <p className="mt-2 text-xs text-ink-500">
-            {n.sourced ? 'Figures from public listings; confirm against the current label before launch.' : 'Mock figures for this concept build; replace with the current label values before launch.'}
-          </p>
-        </div>
-      </div>
-    </section>
   );
 }
 
@@ -327,7 +345,9 @@ export default function ProductPage() {
           {product.isClinicallyTested && <p className="eyebrow text-proof-400">India’s first clinically tested whey</p>}
           <h1 className="display-tight mt-3 text-[clamp(1.9rem,1.2rem+2.2vw,3rem)] leading-[1.02]">{product.name}</h1>
           {product.oneLiner && <p className="mt-3 text-lede text-bone-300">{product.oneLiner}</p>}
-          <Rating rating={product.rating} count={product.reviewCount} className="mt-4" />
+          <a href="#reviews" className="mt-4 inline-block rounded-xs underline-offset-4 hover:underline" aria-label={`${product.rating.toFixed(1)} out of 5, ${product.reviewCount.toLocaleString('en-IN')} verified reviews. Go to reviews`}>
+            <Rating rating={product.rating} count={product.reviewCount} />
+          </a>
 
           {specChips.length > 0 && (
             <ul className="mt-6 flex flex-wrap gap-2" aria-label={specPer ? `Key specs per ${specPer}` : 'Key specs'}>
@@ -389,9 +409,10 @@ export default function ProductPage() {
         </div>
       </section>
 
-      {isBiozyme && <WhyBiozyme powder={flavourColor} />}
-      {hasMacros && <NutritionPanel product={product} powder={flavourColor} />}
+      {hasMacros && <ScoopStory product={product} powder={flavourColor} showWhy={isBiozyme} />}
       {hasMacros && <NutritionBox product={product} flavourName={flavour?.name ?? ''} flavourColor={flavourColor} sizeLabel={size.label} servings={size.servings} />}
+
+      <ReviewsBlock product={product} flavourId={product.flavours.length > 1 ? flavour?.id ?? null : null} flavourName={flavour?.family !== 'tbc' ? flavour?.name : undefined} />
 
       {isBiozyme && (
         <section aria-labelledby="howto-title" className="border-t hairline py-20 md:py-28">
@@ -454,8 +475,6 @@ export default function ProductPage() {
           </div>
         </section>
       )}
-
-      <ReviewsBlock product={product} flavourId={product.flavours.length > 1 ? flavour?.id ?? null : null} flavourName={flavour?.family !== 'tbc' ? flavour?.name : undefined} />
 
       {/* Mobile sticky buy bar — product, price, CTA always in reach */}
       <div className="fixed inset-x-0 bottom-0 z-40 flex items-center gap-3 border-t hairline bg-ink-900/95 p-3 backdrop-blur lg:hidden">

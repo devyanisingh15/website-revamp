@@ -41,7 +41,7 @@ export function ReviewsBlock({ product, flavourId, flavourName }: { product: Pro
   const flavourOf = (r: Review) => product.flavours.find((f) => f.id === r.flavourId);
 
   return (
-    <section aria-labelledby="reviews-title" className="border-t hairline py-20">
+    <section id="reviews" aria-labelledby="reviews-title" className="scroll-mt-[calc(var(--header-h)+16px)] border-t hairline py-20">
       <div className="container-x">
         <div className="flex flex-wrap items-end justify-between gap-6">
           <div>
