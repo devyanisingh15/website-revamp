@@ -110,13 +110,15 @@ export const SHAKER = {
 export const HAND_PHOTO = {
   pxToM: (CONTAINER.bodyRadius * 2) / 610,
   top: {
-    rect: { x: 113, y: 10, w: 716, h: 438 },
+    /** includes the forearm extended upward from the back of the hand (scripts/key-reference-photos.py) */
+    rect: { x: 113, y: -896, w: 716, h: 1344 },
     /** fingertips (near-left rim) and thumb (far-right rim) gripping the lid */
     fingers: { x: 360, y: 415 },
     thumb: { x: 783, y: 250 },
   },
   bottom: {
-    rect: { x: 459, y: 569, w: 821, h: 570 },
+    /** includes the forearm extended to the right past the photo border */
+    rect: { x: 459, y: 569, w: 1457, h: 570 },
     /** where the fingertips wrap the jar's left silhouette, and the jar axis in the photo */
     fingertips: { x: 478, y: 820 },
     jarAxisX: 655,

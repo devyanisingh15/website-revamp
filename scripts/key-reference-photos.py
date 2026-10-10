@@ -88,13 +88,78 @@ for name,seed in [('top',(250,200)),('bottom',(900,860))]:
   layers[name]=dict(x=int(x0),y=int(y0),w=int(x1-x0),h=int(y1-y0))
 layers['source']=dict(w=W,h=H)
 print('hand cut-outs (update HAND_PHOTO in config/assets.ts if these move):', layers)
-# Arms dissolve into the dark at the photo's cut edges (top hand: top, lower hand: right)
-for name,edge in [('top','top'),('bottom','right')]:
-  im=np.asarray(Image.open(OUT+f'hand-{name}.png')).astype(np.float32)
-  H_,W_=im.shape[:2]; yy_,xx_=np.mgrid[0:H_,0:W_]
-  d = yy_ if edge=='top' else (W_-1-xx_)
-  im[...,3]*=ss(d,6,95); im[...,:3]*=(0.35+0.65*ss(d,10,230))[...,None]
-  Image.fromarray(im.clip(0,255).astype(np.uint8),'RGBA').save(OUT+f'hand-{name}.png')
+# Extend the forearms so they leave the frame instead of ending mid-air. A band of
+# the wrist is carried outward (lower hand: from its right cut edge, to the right;
+# upper hand: from the back of the hand, where it is wrist-width, upward), with
+# rounded shading across the arm, a slight blur along it, and a fall-off into the
+# dark like an arm leaving the key light. HAND_PHOTO's rects include the extension.
+ARMS = {
+  # name: (axis the arm runs along, index where the arm starts in the cut-out, length px)
+  'bottom': ('x+', None, 640),   # None = the cut-out's right edge (the photo border)
+  'top': ('y-', 44, 950),        # row 44: back of the hand is ~300 px wide here; long enough to leave a phone screen
+}
+BAND = 8
+def boxblur(x, r, ax):
+  k = np.ones(2 * r + 1) / (2 * r + 1)
+  return np.apply_along_axis(lambda v: np.convolve(np.pad(v, r, mode='edge'), k, mode='valid'), ax, x)
+for name, (dirn, start, E_) in ARMS.items():
+  im = np.asarray(Image.open(OUT + f'hand-{name}.png')).astype(np.float32)
+  H_, W_ = im.shape[:2]
+  if dirn == 'x+':
+    c0 = (W_ - 4) if start is None else start
+    band = im[:, c0 - BAND:c0].mean(axis=1)                     # (H,4) profile across the arm
+    prof = band[:, 3] > 128
+    idx = np.nonzero(prof)[0]; cen, hw = (idx.min() + idx.max()) / 2, (idx.max() - idx.min()) / 2
+    u = (np.arange(H_) - cen) / max(hw, 1)
+    ext = np.repeat(band[:, None, :], E_, axis=1)
+    t = np.linspace(0, 1, E_)[None, :]                           # 0 at the wrist → 1 at the arm's end
+    U = np.repeat(u[:, None], E_, axis=1)
+    keep = im[:, :c0]
+  else:
+    r0 = start
+    band = im[r0:r0 + BAND].mean(axis=0)                         # (W,4)
+    prof = band[:, 3] > 128
+    idx = np.nonzero(prof)[0]; cen, hw = (idx.min() + idx.max()) / 2, (idx.max() - idx.min()) / 2
+    u = (np.arange(W_) - cen) / max(hw, 1)
+    ext = np.repeat(band[None, :, :], E_, axis=0)[::-1]          # row 0 = far end
+    t = np.linspace(1, 0, E_)[:, None]
+    U = np.repeat(u[None, :], E_, axis=0)
+    keep = im[r0:]
+  # Skin: smooth the band across the arm (alpha-weighted) so knuckle/vein detail doesn't
+  # smear into streaks; blend from the exact wrist pixels to the smooth version.
+  ax_across = 0 if dirn == 'x+' else 1
+  ax_band = 0  # band is 1-D (across) × 4
+  wgt = band[:, 3:4] / 255.0
+  sm_rgb = np.stack([boxblur(band[:, c] * wgt[:, 0], 22, 0) for c in range(3)], -1)
+  sm_w = boxblur(wgt[:, 0], 22, 0)[:, None]
+  smooth = np.concatenate([sm_rgb / np.maximum(sm_w, 1e-3), band[:, 3:4]], -1)
+  smooth_ext = np.repeat(smooth[:, None, :], E_, axis=1) if dirn == 'x+' else np.repeat(smooth[None, :, :], E_, axis=0)[::-1]
+  mix = ss(t, 0.0, 0.1)[..., None]
+  ext = ext * (1 - mix) + smooth_ext * mix
+  # Silhouette: gently tapered with soft edges, eased in from the real wrist outline
+  taper = 1 - 0.12 * t
+  prof_a = 255 * (1 - ss(np.abs(U), taper - 0.07, taper + 0.03))
+  ext[..., 3] = ext[..., 3] * (1 - mix[..., 0]) + prof_a * mix[..., 0]
+  # rounded (cylindrical) shading across the arm, eased in from the wrist so there's no seam
+  cyl = 0.7 + 0.3 * np.sqrt(np.clip(1 - U * U, 0, 1))
+  cyl = 1 + (cyl - 1) * ss(t, 0.0, 0.12)
+  # falls out of the light toward the frame edge; only the very end fades out
+  shade = cyl * (1 - 0.6 * ss(t, 0.05, 0.85))
+  fade = 1 - ss(t, 0.8, 1.0)
+  rgb = ext[..., :3] * shade[..., None]
+  a = ext[..., 3] * fade
+  # soften pixel streaks along the arm
+  ax_along = 1 if dirn == 'x+' else 0
+  rgb = np.stack([boxblur(rgb[..., c], 4, ax_along) for c in range(3)], -1)
+  arm = np.dstack([rgb, a[..., None]])
+  out = np.concatenate([keep, arm], axis=1) if dirn == 'x+' else np.concatenate([arm, keep], axis=0)
+  Image.fromarray(np.clip(out, 0, 255).astype(np.uint8), 'RGBA').save(OUT + f'hand-{name}.png')
+  r = layers[name]
+  if dirn == 'x+':
+    r['w'] = c0 + E_
+  else:
+    r['y'] = r['y'] + r0 - E_; r['h'] = H_ - r0 + E_
+print('with forearm extension (HAND_PHOTO rects):', {k: layers[k] for k in ('top', 'bottom')})
 
 # ---------------------------------------------------------------- powder
 SRC=ROOT+'assets-src/reference/powder-scoop.jpg'
